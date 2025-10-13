@@ -1,0 +1,18 @@
+{
+  "frame": {
+    "name": "Farcaster Achievement",
+    "homeUrl": "https://farcaster-achivement.vercel.app/",
+    "iconUrl": "https://farcaster-achivement.vercel.app/icon.png",
+    "version": "1",
+    "subtitle": "Generate onchain achievements",
+    "description": "Generate achievement image from your Farcaster history",
+    "splashImageUrl": "https://farcaster-achivement.vercel.app/splash.png",
+    "primaryCategory": "utility",
+    "splashBackgroundColor": "#eeccff"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI5Mjg4MywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDE0QzZBM0ZiMGZhNDZBNDNkMDFEQzc0MjZEN2MyN2NmOEM3MWMxMGEifQ",
+    "payload": "eyJkb21haW4iOiJmYXJjYXN0ZXItYWNoaXZlbWVudC52ZXJlbC5hcHAifQ",
+    "signature": "MHhhZDBkMjFiODNjYjdhMWZjNTA1ZWRiOTUzYTczYjFlMzExMTUwMWIyMjJmMDkzOTNkMjk4Mjg4NDI2NjVhMzkyNTQ0YWIzMDM0NmViMDJhZGVkOGE2NWViYTQ4OThlODE0ZDgzN2EwNzE4YjcwNDNlYTlmNmZkY2IzMDIyNDRiODFi"
+  }
+}
