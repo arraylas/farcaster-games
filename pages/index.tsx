@@ -1,64 +1,53 @@
+// pages/index.tsx
 import { useEffect, useState } from 'react';
-import { sdk } from '@farcaster/miniapp-sdk';
 
 export default function Home() {
   const [dob, setDob] = useState('');
   const [age, setAge] = useState<number | null>(null);
-  const [fid, setFid] = useState<string | null>(null);
 
-  // Ambil fid Farcaster user (jika user login di miniapp)
   useEffect(() => {
-    const fetchFid = async () => {
-      try {
-        const user = await sdk.getProfile(); // Ambil profil user
-        if (user?.fid) {
-          setFid(user.fid);
-
-          const storedDob = localStorage.getItem(`dob-${user.fid}`);
-          if (storedDob) {
-            setDob(storedDob);
-            setAge(calculateAge(storedDob));
-          }
-        }
-      } catch (err) {
-        console.log('Tidak bisa ambil profile, user harus input DOB manual.', err);
-      }
-    };
-    fetchFid();
+    const storedDob = localStorage.getItem('dob');
+    if (storedDob) {
+      setDob(storedDob);
+      setAge(calculateAge(storedDob));
+    }
   }, []);
 
   const calculateAge = (dateOfBirth: string) => {
     const birthDate = new Date(dateOfBirth);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
     return age;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fid) return; // Pastikan ada fid untuk key localStorage
-    localStorage.setItem(`dob-${fid}`, dob);
+    localStorage.setItem('dob', dob);
     setAge(calculateAge(dob));
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '400px', margin: 'auto' }}>
-      <h1>Cek Umur Farcaster</h1>
-
+    <div style={{ padding: '2rem', maxWidth: '400px', margin: 'auto', fontFamily: 'sans-serif' }}>
+      <h1>Age Checker</h1>
       {!age ? (
         <form onSubmit={handleSubmit}>
+          <label htmlFor="dob">Enter your date of birth:</label>
           <input
+            id="dob"
             type="date"
             value={dob}
             onChange={(e) => setDob(e.target.value)}
             required
+            style={{ display: 'block', margin: '1rem 0', padding: '0.5rem', width: '100%' }}
           />
-          <button type="submit">Simpan & Hitung Umur</button>
+          <button type="submit" style={{ padding: '0.5rem 1rem' }}>
+            Save & Calculate Age
+          </button>
         </form>
       ) : (
-        <p>Umur Anda: {age} tahun</p>
+        <p>Your age: {age} years</p>
       )}
     </div>
   );
