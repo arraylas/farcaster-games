@@ -10,7 +10,7 @@ export default function Home() {
   useEffect(() => {
     const fetchFarcasterData = async () => {
       try {
-        // ✅ Get the Farcaster context
+        // ✅ Get Farcaster context
         const context = await sdk.context;
         console.log('MiniApp Context:', context);
 
@@ -28,12 +28,15 @@ export default function Home() {
         if (!neynarApiKey) throw new Error('Missing NEYNAR API key');
 
         // ✅ Fetch user data from Neynar API
-        const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${fidValue}`, {
-          headers: {
-            accept: 'application/json',
-            api_key: neynarApiKey,
-          },
-        });
+        const response = await fetch(
+          `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fidValue}`,
+          {
+            headers: {
+              'accept': 'application/json',
+              'x-api-key': neynarApiKey, // ✅ perbaikan: x-api-key
+            },
+          }
+        );
 
         const data = await response.json();
         console.log('Neynar Response:', data);
@@ -44,6 +47,8 @@ export default function Home() {
           const now = new Date();
           const diffYears = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 365);
           setAccountAge(Math.floor(diffYears));
+        } else {
+          console.warn('User data or created_at not found');
         }
 
       } catch (err) {
