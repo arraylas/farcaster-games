@@ -5,63 +5,163 @@ const WIN_COUNT = 3;
 
 export default function OXOXGame() {
   const [board, setBoard] = useState(Array(SIZE*SIZE).fill(null));
-    const [gameOver, setGameOver] = useState(false);
-      const [score, setScore] = useState(0);
-        const [leaderboard, setLeaderboard] = useState<{ player: string; points: number; date: string }[]>([]);
-          const [user, setUser] = useState<{ username: string } | null>(null);
-            const [winnerMessage, setWinnerMessage] = useState('');
+  const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0);
+  const [leaderboard, setLeaderboard] = useState<{ player: string; points: number; date: string }[]>([]);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [winnerMessage, setWinnerMessage] = useState('');
 
-              useEffect(() => {
-                  let mounted = true;
+  useEffect(() => {
+    let mounted = true;
 
-                      (async () => {
-                            if (typeof window === 'undefined') return;
-                                  try {
-                                          const sdkModule = await import('@farcaster/mini-app-sdk');
-                                                  const { useMiniApp } = sdkModule;
-                                                          const { user } = useMiniApp();
-                                                                  if (mounted) setUser(user);
-                                                                        } catch {
-                                                                                if (mounted) setUser(null);
-                                                                                      }
-                                                                                          })();
+    (async () => {
+      if (typeof window === 'undefined') return;
+      try {
+        const sdkModule = await import('@farcaster/mini-app-sdk');
+        const { useMiniApp } = sdkModule;
+        const { user } = useMiniApp();
+        if (mounted) setUser(user);
+      } catch {
+        if (mounted) setUser(null);
+      }
+    })();
 
-                                                                                              // Load leaderboard from localStorage
-                                                                                                  const allTime = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-                                                                                                      setLeaderboard(allTime.filter(item => new Date(item.date) >= getWeekStart()));
+    const allTime = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+    setLeaderboard(allTime.filter(item => new Date(item.date) >= getWeekStart()));
 
-                                                                                                          return () => { mounted = false; };
-                                                                                                            }, []);
+    return () => { mounted = false; };
+  }, []);
 
-                                                                                                              function getWeekStart() {
-                                                                                                                  const d = new Date();
-                                                                                                                      d.setHours(0,0,0,0);
-                                                                                                                          d.setDate(d.getDate() - d.getDay());
-                                                                                                                              return d;
-                                                                                                                                }
+  function getWeekStart() {
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+  }
 
-                                                                                                                                  function checkWinner(b: string[]) {
-                                                                                                                                      function inBounds(x: number, y: number){ return x>=0 && x<SIZE && y>=0 && y<SIZE; }
-                                                                                                                                          for(let y=0;y<SIZE;y++){
-                                                                                                                                                for(let x=0;x<SIZE;x++){
-                                                                                                                                                        const player = b[y*SIZE+x];
-                                                                                                                                                                if(!player) continue;
-                                                                                                                                                                        const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-                                                                                                                                                                                for(const [dx,dy] of dirs){
-                                                                                                                                                                                          let count=0;
-                                                                                                                                                                                                    for(let k=0;k<WIN_COUNT;k++){
-                                                                                                                                                                                                                const nx = x + dx*k, ny = y + dy*k;
-                                                                                                                                                                                                                            if(inBounds(nx,ny) && b[ny*SIZE+nx]===player) count++;
-                                                                                                                                                                                                                                      }
-                                                                                                                                                                                                                                                if(count===WIN_COUNT) return player;
-                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                              }
-                                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                                      if(!b.includes(null)) return 'Draw';
-                                                                                                                                                                                                                                                                          return null;
-                                                                                                                                                                                                                                                                            }
+  function checkWinner(b: string[]) {
+    function inBounds(x: number, y: number){ return x>=0 && x<SIZE && y>=0 && y<SIZE; }
+    for(let y=0;y<SIZE;y++){
+      for(let x=0;x<SIZE;x++){
+        const player = b[y*SIZE+x];
+        if(!player) continue;
+        const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+        for(const [dx,dy] of dirs){
+          let count=0;
+          for(let k=0;k<WIN_COUNT;k++){
+            const nx = x + dx*k, ny = y + dy*k;
+            if(inBounds(nx,ny) && b[ny*SIZE+nx]===player) count++;
+          }
+          if(count===WIN_COUNT) return player;
+        }
+      }
+    }
+    if(!b.includes(null)) return 'Draw';
+    return null;
+  }
 
-                                                                                                                                                                                                                                                                              function handleClick(index:number) {
+  function handleClick(index:number) {
+    if(board[index] || gameOver) return;
+    const newBoard = [...board];
+    newBoard[index]='X';
+    setBoard(newBoard);
+
+    const winner = checkWinner(newBoard);
+    if(winner){ setGameOver(true); handleWin(winner); return; }
+    setTimeout(() => computerMove(newBoard), 500);
+  }
+
+  function computerMove(currentBoard: string[]) {
+    const empty = currentBoard.map((v,i)=>v===null?i:null).filter(i=>i!==null) as number[];
+    if(empty.length===0) return;
+    const choice = empty[Math.floor(Math.random()*empty.length)];
+    const newBoard = [...currentBoard];
+    newBoard[choice]='O';
+    setBoard(newBoard);
+
+    const winner = checkWinner(newBoard);
+    if(winner){ setGameOver(true); handleWin(winner); }
+  }
+
+  function handleWin(winner:string){
+    if(winner==='X'){
+      setWinnerMessage('You won!');
+      setScore(prev=>prev+1);
+      updateLeaderboard(user?.username||'You',1);
+    } else if(winner==='O'){
+      setWinnerMessage('Computer won!');
+    } else {
+      setWinnerMessage("It's a draw!");
+    }
+  }
+
+  function updateLeaderboard(player:string, points:number){
+    const allTime = JSON.parse(localStorage.getItem('leaderboard')||'[]');
+    allTime.push({player, points, date:new Date().toISOString()});
+    localStorage.setItem('leaderboard', JSON.stringify(allTime));
+    setLeaderboard(allTime.filter(item=>new Date(item.date) >= getWeekStart()));
+  }
+
+  async function shareResult(){
+    const winner = checkWinner(board);
+    let text:string;
+    if(winner==='X') text="I won against the computer in OXOX 9x9!";
+    else if(winner==='O') text="The computer won in OXOX 9x9!";
+    else text="It's a draw in OXOX 9x9!";
+
+    try{
+      if(user){
+        const sdkModule = await import('@farcaster/mini-app-sdk');
+        const { useMiniApp } = sdkModule;
+        const { user: sdkUser } = useMiniApp();
+        await sdkUser.share({ text });
+        alert('Result shared to Farcaster!');
+      } else {
+        const url = `https://farcaster.xyz/share?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+      }
+    } catch(e){
+      console.error(e);
+      alert('Failed to share result.');
+    }
+  }
+
+  function resetBoard(){
+    setBoard(Array(SIZE*SIZE).fill(null));
+    setGameOver(false);
+    setWinnerMessage('');
+  }
+
+  return (
+    <div style={{display:'flex', flexDirection:'column', alignItems:'center', padding:'20px'}}>
+      <h2>OXOX 9x9 vs Computer</h2>
+      <div style={{ display:'grid', gridTemplateColumns:`repeat(${SIZE},40px)`, gap:'2px', marginTop:'10px'}}>
+        {board.map((val,idx)=>(
+          <button key={idx} 
+                  onClick={()=>handleClick(idx)} 
+                  disabled={gameOver || val!==null} 
+                  style={{width:'40px', height:'40px', fontSize:'20px'}}>
+            {val}
+          </button>
+        ))}
+      </div>
+      <div style={{marginTop:'15px'}}>
+        <button onClick={resetBoard} style={{padding:'10px 20px'}}>Reset</button>
+        <button onClick={shareResult} style={{padding:'10px 20px', marginLeft:'5px'}}>Share Result</button>
+      </div>
+      {winnerMessage && <div style={{marginTop:'10px', fontWeight:'bold'}}>{winnerMessage}</div>}
+      <div style={{marginTop:'15px'}}>
+        <h3>Weekly Leaderboard</h3>
+        <ol>
+          {leaderboard.sort((a,b)=>b.points-a.points).map((item,i)=>(
+            <li key={i}>{item.player}: {item.points}</li>
+          ))}
+        </ol>
+      </div>
+      <div style={{marginTop:'10px'}}>Current Score: {score}</div>
+    </div>
+  );
+      }                                                                                                                                                                                                                                                                              function handleClick(index:number) {
                                                                                                                                                                                                                                                                                   if(board[index] || gameOver) return;
                                                                                                                                                                                                                                                                                       const newBoard = [...board];
                                                                                                                                                                                                                                                                                           newBoard[index]='X';
