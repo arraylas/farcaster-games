@@ -20,16 +20,20 @@ const pieceToChar = (piece: any) => {
     Q: "♕",
     K: "♔",
   };
-  return symbols[piece?.type ? (piece.color === "w" ? piece.type.toUpperCase() : piece.type) : ""] || "";
+  if (!piece) return "";
+  const key = piece.color === "w" ? piece.type.toUpperCase() : piece.type;
+  return symbols[key] || "";
 };
-
-const isWhite = (piece: any) => piece?.color === "w";
 
 const ChessGame: React.FC<ChessGameProps> = ({ onGameOver }) => {
   const [game] = useState(new Chess());
-  const [board, setBoard] = useState(game.board());
+  const [board, setBoard] = useState<any[][]>([]);
   const [selected, setSelected] = useState<[number, number] | null>(null);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+
+  useEffect(() => {
+    setBoard(game.board());
+  }, [game]);
 
   const makeAiMove = () => {
     const moves = game.moves();
@@ -70,39 +74,51 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver }) => {
       }
     } else {
       const piece = board[r][c];
-      if (piece && isWhite(piece)) {
+      if (piece && piece.color === "w") {
         setSelected([r, c]);
       }
     }
   };
 
-  useEffect(() => {
-    setBoard(game.board());
-  }, [game]);
-
   return (
     <div className="flex flex-col items-center justify-center mt-4">
       <div className="bg-amber-900 p-3 rounded-2xl shadow-lg">
-        <div className="grid grid-cols-8 gap-0 border-4 border-amber-800 rounded-lg overflow-hidden">
-          {board.map((row, r) =>
-            row.map((p, c) => {
-              const dark = (r + c) % 2 === 1;
-              const key = `${r}-${c}`;
-              return (
-                <div
-                  key={key}
-                  onClick={() => handleSquareClick(r, c)}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-2xl sm:text-3xl cursor-pointer select-none
-                    ${dark ? "bg-amber-800" : "bg-amber-200"}
-                    ${selected && selected[0] === r && selected[1] === c ? "ring-4 ring-yellow-400" : ""}
-                    ${p && isWhite(p) ? "text-white" : p ? "text-black" : ""}
-                  `}
-                >
-                  {pieceToChar(p)}
-                </div>
-              );
-            })
-          )}
+        {/* papan chess 8x8 */}
+        <div
+          className="grid border-4 border-amber-800 rounded-lg overflow-hidden"
+          style={{
+            gridTemplateColumns: "repeat(8, 1fr)",
+            gridTemplateRows: "repeat(8, 1fr)",
+            width: "384px",
+            height: "384px",
+          }}
+        >
+          {board
+            .slice() // bikin salinan biar ga mutasi data asli
+            .reverse() // posisi kamu di bawah, AI di atas
+            .map((row, r) =>
+              row.map((p, c) => {
+                const dark = (r + c) % 2 === 1;
+                const realRow = 7 - r; // adjust index setelah reverse
+                return (
+                  <div
+                    key={`${realRow}-${c}`}
+                    onClick={() => handleSquareClick(realRow, c)}
+                    className={`flex items-center justify-center text-2xl sm:text-3xl cursor-pointer select-none
+                      ${dark ? "bg-amber-700" : "bg-amber-200"}
+                      ${selected &&
+                      selected[0] === realRow &&
+                      selected[1] === c
+                        ? "ring-4 ring-yellow-400"
+                        : ""}
+                      ${p && p.color === "w" ? "text-white" : "text-black"}
+                    `}
+                  >
+                    {pieceToChar(p)}
+                  </div>
+                );
+              })
+            )}
         </div>
       </div>
 
