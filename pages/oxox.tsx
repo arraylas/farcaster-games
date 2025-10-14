@@ -159,6 +159,25 @@ const TicTacToe5x5: NextPage = () => {
     setIsXNext(true);
   };
 
+  // === 🟣 Share to Warpcast ===
+  const handleShareCast = () => {
+    const appUrl = "https://farcaster-achivement.vercel.app/oxox"; // Ganti dengan domain kamu
+    let message = "";
+
+    if (winner) {
+      message = `I just won as ${winner} in the XOXO 5x5 Farcaster MiniApp! Can you beat me? Play here: ${appUrl}`;
+    } else if (isDraw) {
+      message = `It was a draw in the XOXO 5x5 Farcaster MiniApp! Try your luck: ${appUrl}`;
+    } else {
+      message = `Check out this XOXO 5x5 MiniApp! Play against the computer: ${appUrl}`;
+    }
+
+    const farcasterCastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(farcasterCastUrl, "_blank");
+  };
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>XOXO 5x5 (4-in-a-row VS Computer)</h1>
@@ -176,10 +195,33 @@ const TicTacToe5x5: NextPage = () => {
         ))}
       </div>
 
-      <div style={{ display: "flex", marginTop: "10px" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <button onClick={resetGame} className={styles.resetButton}>
           Restart Game
         </button>
+
+        {(winner || isDraw) && (
+          <>
+            <button
+              onClick={handleShareCast}
+              className={styles.shareButton}
+              style={{ marginTop: "10px" }}
+            >
+              Share to Warpcast 🎙️
+            </button>
+
+            <button
+              onClick={() => (window.location.href = "/")}
+              className={styles.resetButton}
+              style={{
+                backgroundColor: "#635BFF",
+                marginTop: "10px",
+              }}
+            >
+              Back to Menu 🏠
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
