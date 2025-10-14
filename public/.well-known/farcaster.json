@@ -4,30 +4,31 @@
   "homeUrl": "https://farcaster-games.netlify.app/",
   "version": "1",
   "subtitle": "Chess, OXOX, and Onchain Achievement Generator",
-  "description": "A combined Mini App featuring single-player games (Chess, OXOX 5x5) and a tool to generate onchain achievement images from your Farcaster history.",
+  "description": "A combined Mini App featuring single-player games and a tool to generate onchain achievements.",
   "primaryCategory": "games",
   "tags": [
     "chess",
     "games",
-    "achievement",
     "utility",
-    "farcaster"
+    "farcaster",
+    "frame"
   ],
   "tagline": "Play games and visualize your Farcaster journey.",
-  "buttonTitle": "Launch Mini App",
-  "ogTitle": "Farcaster Games & Achievements",
+  "buttonTitle": "Play Farcaster Games",
+  "ogTitle": "Farcaster Games: Chess & OXOX",
   "ogDescription": "Play games or generate your onchain achievements instantly.",
   "ogImageUrl": "https://farcaster-games.netlify.app/splash.png",
   "castShareUrl": "https://farcaster-games.netlify.app/",
-
   "splashImageUrl": "https://farcaster-games.netlify.app/splash.png",
   "splashBackgroundColor": "#eeccff",
+  
   "baseBuilder": {
     "allowedAddresses": ["0x14c6a3fb0fa46a43d01dc7426d7c27cf8c71c10a"]
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjI5Mjg4MywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDE0QzZBM0ZiMGZhNDZBNDNkMDFEQzc0MjZEN2MyN2NmOEM3MWMxMGEifQ",
-    "payload": "eyJkb21haW4iOiJmYXJjYXN0ZXItYWNoaXZlbWVudC52ZXJjZWwuYXBwIn0",
-    "signature": "MHhhZDBkMjFiODNjYjdhMWZjNTA1ZWRiOTUzYTczYjFlMzExMTUwMWIyMjJmMDkzOTNkMjk4Mjg4NDI2NjVhMzkyNTQ0YWIzMDM0NmViMDJhZGVkOGE2NWViYTQ4OThlODE0ZDgzN2EwNzE4YjcwNDNlYTlmNmZkY2IzMDIyNDRiODFi"
-  }
+    "payload": "eyJkb21haW4iOiJmYXJjYXN0ZXItZ2FtZXMubmV0bGlmeS5jb20ifQ",
+    "signature": "MHgxNTgwMzZkMTBlMjgxMTAwNGM1NWNiNmVhNjkyNmY2MDliOTg1MjA3ZWRlODEyNTI1MTI3MWQyMzQyM2U3MDBjNGI5ODUyMGViYTQ4OThlODE0ZDgzN2EwNzE4YjcwNDNlYTlmNmZkY2IzMDIyNDRiODFi"
+  },
+  "webhookUrl": "https://farcaster-games.netlify.app/api/webhook"
 }
