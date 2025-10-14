@@ -1,54 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import type { NextPage } from 'next';
+import Link from 'next/link';
 
-export default function HomeMiniApp() {
-  const router = useRouter();
-  const [user, setUser] = useState<{ username: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+// Basic inline styling for a clean, Farcaster-themed landing page
+const containerStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: '100vh',
+  padding: '20px',
+  textAlign: 'center',
+  fontFamily: 'Arial, sans-serif',
+  backgroundColor: '#f9f9f9',
+};
 
-  useEffect(() => {
-    let mounted = true;
+const titleStyle: React.CSSProperties = {
+  color: '#635BFF', // Farcaster-like purple/blue
+  marginBottom: '10px',
+};
 
-    (async () => {
-      if (typeof window === 'undefined') return; // server-safe
-      try {
-        const sdkModule = await import('@farcaster/mini-app-sdk');
-        const { useMiniApp } = sdkModule;
-        const { user } = useMiniApp();
-        if (mounted) setUser(user);
-      } catch {
-        if (mounted) setUser(null);
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
+const paragraphStyle: React.CSSProperties = {
+  maxWidth: '600px',
+  margin: '10px 0 30px 0',
+  fontSize: '1.1em',
+  color: '#333',
+};
 
-    return () => { mounted = false; };
-  }, []);
+const linkStyle: React.CSSProperties = {
+  padding: '12px 25px',
+  fontSize: '1.2em',
+  backgroundColor: '#635BFF', 
+  color: 'white',
+  textDecoration: 'none',
+  borderRadius: '8px',
+  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+  transition: 'background-color 0.3s',
+};
 
-  const handlePlayClick = () => router.push('/oxox');
-
-  if (isLoading) return (
-    <div style={{ display:'flex', justifyContent:'center', alignItems:'center', height:'100vh' }}>
-      <p>Loading user info...</p>
-    </div>
-  );
-
+const IndexPage: NextPage = () => {
   return (
-    <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', height:'100vh' }}>
-      {user ? (
-        <>
-          <h2>Welcome, {user.username}!</h2>
-          <button 
-            onClick={handlePlayClick} 
-            style={{ padding:'15px 30px', fontSize:'20px', marginTop:'20px', cursor:'pointer' }}
-          >
-            Ready to play?
-          </button>
-        </>
-      ) : (
-        <p>Please login with Farcaster to play.</p>
-      )}
+    <div style={containerStyle}>
+      <h1 style={titleStyle}>Welcome to the Farcaster Achievement MiniApp 🏅</h1>
+      
+      <p style={paragraphStyle}>
+        This is the landing page for your MiniApp. The Farcaster SDK has been initialized in 
+        `_app.tsx` and is ready to use for connecting user context or achievements.
+      </p>
+      
+      <h2>Ready to Play?</h2>
+      
+      {/* Button linking to the XOXO 9x9 game page */}
+      <Link href="/oxox" style={linkStyle}>
+        Start XOXO 9x9 Game 🎮
+      </Link>
+
+      <p style={{ marginTop: '50px', fontSize: '0.9em', color: '#888' }}>
+        *Check your browser console for the Farcaster SDK initialization status.*
+      </p>
     </div>
   );
-}                                                                                                                                                                                                                                                              }
+};
+
+export default IndexPage;
