@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Chess, Square } from "chess.js"; // PERBAIKAN: Import Square type
+import { Chess, Square } from "chess.js";
 
 interface ChessGameProps {
   onGameOver: (result: "You" | "AI" | "Draw") => void;
-  isDarkTheme: boolean; 
+  isDarkTheme: boolean; 
 }
 
 // Fungsi untuk mengkonversi objek bidak (piece object) dari chess.js menjadi karakter Unicode
@@ -13,7 +13,7 @@ const pieceToChar = (piece: any) => {
     P: "♙", R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", // White pieces (uppercase)
   };
   if (!piece) return "";
-  
+  
   return symbols[piece.color === 'w' ? piece.type.toUpperCase() : piece.type];
 };
 
@@ -25,8 +25,8 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
 
   // Inisialisasi papan
   useEffect(() => {
-    // Kita harus membalik board array di sini agar player (White) selalu ada di bawah (row 7)
-    setBoard(game.board().reverse()); 
+    // PERBAIKAN: Hapus .reverse(). Papan standar chess.js sudah benar (Rank 8 di atas, Rank 1 di bawah).
+    setBoard(game.board()); 
   }, [game]);
 
   const makeAiMove = () => {
@@ -39,7 +39,8 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
 
     const move = moves[Math.floor(Math.random() * moves.length)];
     game.move(move);
-    setBoard(game.board().reverse());
+    // PERBAIKAN: Hapus .reverse()
+    setBoard(game.board());
     setIsPlayerTurn(true);
 
     if (game.isCheckmate()) onGameOver("AI");
@@ -50,58 +51,55 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
     if (!isPlayerTurn || game.isGameOver()) return;
 
     // Grid JS (r, c) -> Notasi Catur (file, rank)
-    // Karena array papan sudah di-reverse, r=0 adalah rank 8, dan r=7 adalah rank 1
-    const rank = (8 - r) as number; // 0 -> 8, 7 -> 1
-    const file = "abcdefgh"[c]; 
-    const targetSquare = `${file}${rank}` as Square; // PERBAIKAN: Type assertion
+    // Karena TIDAK ada reverse, r=0 adalah Rank 8, r=7 adalah Rank 1.
+    const rank = (8 - r) as number;
+    const file = "abcdefgh"[c]; 
+    const targetSquare = `${file}${rank}` as Square;
 
     if (selected) {
       const [sr, sc] = selected;
       const selectedRank = 8 - sr;
       const selectedFile = "abcdefgh"[sc];
 
-      const fromSquare = `${selectedFile}${selectedRank}` as Square; // PERBAIKAN: Type assertion
+      const fromSquare = `${selectedFile}${selectedRank}` as Square;
       const toSquare = targetSquare;
-      
-      // Menambahkan promotion 'q' untuk Ratu secara default agar gerakan pion valid
+      
       const result = game.move({ from: fromSquare, to: toSquare, promotion: 'q' });
-      
+      
       if (result) {
-        setBoard(game.board().reverse());
+        // PERBAIKAN: Hapus .reverse()
+        setBoard(game.board());
         setSelected(null);
         setIsPlayerTurn(false);
         if (game.isCheckmate()) onGameOver("You");
         else if (game.isDraw()) onGameOver("Draw");
         else setTimeout(makeAiMove, 500);
       } else {
-        // Jika gerakan tidak valid, batalkan seleksi
         setSelected(null);
       }
     } else {
-      // Dapatkan bidak pada koordinat catur yang benar
-      const piece = game.get(targetSquare); // PERBAIKAN: Menggunakan targetSquare yang sudah di-assert
+      const piece = game.get(targetSquare);
       if (piece && piece.color === "w") {
         setSelected([r, c]);
       }
     }
   };
 
-  const darkSquareColor = isDarkTheme ? "#6C4F7F" : "#7D523C"; 
-  const lightSquareColor = isDarkTheme ? "#CDB5D9" : "#F5EAD4"; 
+  const darkSquareColor = isDarkTheme ? "#6C4F7F" : "#7D523C"; 
+  const lightSquareColor = isDarkTheme ? "#CDB5D9" : "#F5EAD4"; 
 
   return (
     <div className="flex flex-col items-center justify-center mt-4">
       {/* Papan catur 8x8 */}
       <div
         style={{
-// ... (Bagian styling papan tetap sama)
           display: 'grid',
           gridTemplateColumns: "repeat(8, 1fr)",
           gridTemplateRows: "repeat(8, 1fr)",
-          width: "90vw", 
-          maxWidth: "400px", 
-          aspectRatio: '1 / 1', 
-          border: '4px solid #4a148c', 
+          width: "90vw", 
+          maxWidth: "400px", 
+          aspectRatio: '1 / 1', 
+          border: '4px solid #4a148c', 
           borderRadius: '8px',
           overflow: 'hidden',
           boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)'
@@ -110,21 +108,22 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
         {board.map((row, r) =>
           row.map((p, c) => {
             // Menentukan warna kotak (hitam/putih)
-            const dark = (r + c) % 2 === 0; 
+            const dark = (r + c) % 2 === 0; 
             const isSelected = selected && selected[0] === r && selected[1] === c;
-            
+            
             return (
               <div
                 key={`${r}-${c}`}
                 onClick={() => handleSquareClick(r, c)}
                 style={{
-// ... (Bagian styling kotak tetap sama)
                     backgroundColor: dark ? darkSquareColor : lightSquareColor,
-                    color: p && p.color === 'w' ? '#FFFFFF' : '#000000', 
+                    // PERBAIKAN: Set warna bidak agar bidak hitam terlihat di dark theme
+                    color: p && p.color === 'w' ? '#FFFFFF' : '#111111', 
+                    
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '4.5vmin', 
+                    fontSize: '4.5vmin', 
                     fontWeight: 'bold',
                     cursor: 'pointer',
                     userSelect: 'none',
