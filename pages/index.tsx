@@ -1,3 +1,4 @@
+// pages/index.tsx
 import Head from 'next/head';
 import Link from 'next/link';
 import { SiFarcaster } from 'react-icons/si';
@@ -6,13 +7,14 @@ import { FaChessPawn } from 'react-icons/fa';
 import { PiRocketLaunchFill } from 'react-icons/pi';
 
 const APP_DOMAIN = "https://farcaster-games.netlify.app";
-const EMBED_IMAGE_URL = `${APP_DOMAIN}/farcaster-games-embed.png`;
+// Anda harus menempatkan farcaster-games-embed.png di folder /public
+const EMBED_IMAGE_URL = `${APP_DOMAIN}/farcaster-games-embed.png`; 
 const SUPPORT_ADDRESS = "0x3f05e8770134e70a7acd907c2725d8da64f0f8fe";
 
 const miniappMetadata = {
   version: "1",
   name: "Farcaster Games Hub & Achievements",
-  iconUrl: `${APP_DOMAIN}/icon.png`,
+  iconUrl: `${APP_DOMAIN}/icon.png`, // Anda harus menempatkan icon.png di folder /public
   homeUrl: APP_DOMAIN,
   subtitle: "Chess, OXOX, and Onchain Achievement Generator",
   description: "A combined Mini App featuring single-player games and a tool to generate onchain achievements.",
@@ -38,6 +40,7 @@ export default function Home() {
         <link rel="apple-touch-icon" href="/icon.png" />
       </Head>
 
+      {/* Bagian utama yang menggunakan Tailwind CSS untuk styling ungu dan gelap */}
       <main className="min-h-screen flex flex-col items-center justify-start py-10 px-6 bg-[#30064a] text-white">
         <div className="w-full max-w-sm text-center p-6 rounded-xl">
           
@@ -60,25 +63,25 @@ export default function Home() {
           </h2>
 
           <div className="flex flex-col space-y-4">
-            {/* OXOX Button */}
+            {/* OXOX Button (Hijau) */}
             <Link 
               href="/oxox" 
               aria-label="Play OXOX 5x5 game versus AI"
               className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl 
-                         bg-green-600 hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] 
-                         shadow-lg shadow-green-900/50"
+                        bg-green-600 hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] 
+                        shadow-lg shadow-green-900/50"
             >
               <span className="text-3xl mr-3 font-bold">X O</span>
               Play OXOX 5x5 vs AI
             </Link>
 
-            {/* Chess Button */}
+            {/* Chess Button (Biru) */}
             <Link 
               href="/chess" 
               aria-label="Play Chess game versus AI"
               className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl 
-                         bg-blue-600 hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] 
-                         shadow-lg shadow-blue-900/50"
+                        bg-blue-600 hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] 
+                        shadow-lg shadow-blue-900/50"
             >
               <FaChessPawn className="text-3xl mr-3" />
               Play Chess vs AI

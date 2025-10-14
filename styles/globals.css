@@ -1,0 +1,11 @@
+/* Pastikan Anda mengimpor ini */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Anda bisa menambahkan gaya kustom lainnya di bawah ini jika diperlukan */
+body {
+    /* Optional: untuk memastikan background penuh */
+    margin: 0;
+    padding: 0;
+}
