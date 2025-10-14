@@ -1,3 +1,4 @@
+//file ChessGame.tsx
 import React, { useState, useEffect } from "react";
 import { Chess, Square } from "chess.js";
 
@@ -19,13 +20,14 @@ const pieceToChar = (piece: any) => {
 const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
   const [game] = useState(new Chess());
   const [board, setBoard] = useState<any[][]>([]);
-  // selected kini menyimpan index array game.board() yang standar (0-7)
+  // selected menyimpan index array yang SUDAH DIBALIK (0=Rank 1/White, 7=Rank 8/Black)
   const [selected, setSelected] = useState<[number, number] | null>(null); 
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
 
-  // Inisialisasi papan: Simpan array board standar (Rank 8 di index 0, Rank 1 di index 7)
+  // Inisialisasi papan: Balik array agar Rank 1 (White) berada di index 0
   useEffect(() => {
-    setBoard(game.board()); 
+    // Menggunakan .slice().reverse() untuk membalik tampilan secara konsisten
+    setBoard(game.board().slice().reverse()); 
   }, [game]);
 
   const makeAiMove = () => {
@@ -38,25 +40,26 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
 
     const move = moves[Math.floor(Math.random() * moves.length)];
     game.move(move);
-    setBoard(game.board());
+    // Update board dengan array yang sudah dibalik
+    setBoard(game.board().slice().reverse());
     setIsPlayerTurn(true);
 
     if (game.isCheckmate()) onGameOver("AI");
     else if (game.isDraw()) onGameOver("Draw");
   };
 
-  // r dan c di sini adalah index array standar (0-7)
+  // r dan c di sini adalah index array yang SUDAH DIBALIK (0=Rank 1, 7=Rank 8)
   const handleSquareClick = (r: number, c: number) => {
     if (!isPlayerTurn || game.isGameOver()) return;
 
-    // Konversi index array (r: 0-7) ke Rank catur (8-1)
-    const rank = (8 - r) as number; 
+    // Logika Konversi Rank: Rank Catur = r + 1. (Karena array sudah dibalik)
+    const rank = (r + 1) as number; 
     const file = "abcdefgh"[c]; 
     const targetSquare = `${file}${rank}` as Square;
 
     if (selected) {
       const [sr, sc] = selected;
-      const selectedRank = 8 - sr; // Konversi index array asal ke Rank catur
+      const selectedRank = sr + 1; // Konversi index yang sudah dibalik ke Rank catur
       const selectedFile = "abcdefgh"[sc];
 
       const fromSquare = `${selectedFile}${selectedRank}` as Square;
@@ -65,7 +68,8 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
       const result = game.move({ from: fromSquare, to: toSquare, promotion: 'q' });
       
       if (result) {
-        setBoard(game.board());
+        // Update board dengan array yang sudah dibalik
+        setBoard(game.board().slice().reverse()); 
         setSelected(null);
         setIsPlayerTurn(false);
         if (game.isCheckmate()) onGameOver("You");
@@ -75,6 +79,7 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
         setSelected(null);
       }
     } else {
+      // Pastikan kita hanya bisa memilih bidak putih (player)
       const piece = game.get(targetSquare);
       if (piece && piece.color === "w") {
         setSelected([r, c]);
@@ -102,23 +107,22 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
           boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)'
         }}
       >
-        {/* PERBAIKAN PENTING: Membalik array saat merender agar White (Rank 1) ada di bawah */}
-        {board.slice().reverse().map((row, r) =>
+        {/* Render board yang sudah dibalik (index 0 = Rank 1/White) */}
+        {board.map((row, r) =>
           row.map((p, c) => {
-            // r di sini adalah index tampilan (0=bawah, 7=atas)
+            // r kini adalah index tampilan catur yang benar (0=bawah, 7=atas)
             const dark = (r + c) % 2 === 0; 
-            const isSelected = selected && selected[0] === (7-r) && selected[1] === c; // Sesuaikan seleksi dengan index array
+            // Logika isSelected menggunakan index yang sudah dibalik
+            const isSelected = selected && selected[0] === r && selected[1] === c;
 
-            // Hitung index array yang benar (0-7) dari index tampilan (r: 0-7)
-            const arrayIndexR = 7 - r; 
-            
             return (
               <div
                 key={`${r}-${c}`}
-                // Panggil handler dengan index array yang BENAR (0=Rank 8, 7=Rank 1)
-                onClick={() => handleSquareClick(arrayIndexR, c)}
+                // Kirim index r dan c yang sudah dibalik (dan benar untuk tampilan)
+                onClick={() => handleSquareClick(r, c)}
                 style={{
                     backgroundColor: dark ? darkSquareColor : lightSquareColor,
+                    // Warna bidak putih: Putih, Bidak hitam: Abu-abu Sangat Gelap (Agar terlihat di dark theme)
                     color: p && p.color === 'w' ? '#FFFFFF' : '#111111', 
                     display: 'flex',
                     alignItems: 'center',
@@ -127,7 +131,6 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
                     fontWeight: 'bold',
                     cursor: 'pointer',
                     userSelect: 'none',
-                    // Sesuaikan logika isSelected untuk index yang dibalik
                     boxShadow: isSelected ? 'inset 0px 0px 0px 4px #FFD700' : 'none',
                     zIndex: isSelected ? 10 : 1,
                 }}
@@ -140,6 +143,7 @@ const ChessGame: React.FC<ChessGameProps> = ({ onGameOver, isDarkTheme }) => {
       </div>
 
       <p className="mt-4 text-sm text-gray-300">You are playing as White</p>
+      <p className="mt-2 text-sm text-gray-400">Your King is under check!</p>
     </div>
   );
 };

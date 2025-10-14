@@ -1,7 +1,8 @@
+//file chess.tsx
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Head from 'next/head';
-import React, { useState } from 'react'; // PERBAIKAN: Import useState
+import React, { useState } from 'react'; // Sudah diperbaiki
 
 // Import komponen game yang sudah diperbaiki
 import ChessGame from '../components/ChessGame'; 
