@@ -1,22 +1,19 @@
 {
-  "name": "farcaster-miniapp",
-  "version": "0.1.0",
+  "name": "farcaster-achievement",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@farcaster/miniapp-sdk": "^0.2.0",
-    "@neynar/react": "^1.2.14",
-    "next": "13.5.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "next": "^13.5.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@farcaster/mini-app-sdk": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.5.1",
-    "@types/react": "^18.2.14",
     "typescript": "^5.2.2"
   }
 }
