@@ -1,4 +1,6 @@
 // pages/_app.tsx
+
+import '../styles/globals.css'; // <--- BARIS INI WAJIB DITAMBAHKAN!
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk';
