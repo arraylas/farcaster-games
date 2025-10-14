@@ -1,16 +1,20 @@
-//file chess.tsx
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Head from 'next/head';
-import React, { useState } from 'react'; // Sudah diperbaiki
+import React, { useState } from 'react';
 
 // Import komponen game yang sudah diperbaiki
-import ChessGame from '../components/ChessGame'; 
+import dynamic from 'next/dynamic';
 
-// --- STYLE OBJECTS (Consisten with your dark design) ---
+// Dynamic Import (PENTING untuk Pages Router juga)
+const ChessGame = dynamic(() => import('../components/ChessGame'), {
+    ssr: false, 
+});
+
+// --- STYLE OBJECTS ---
 
 const GRADIENT_BACKGROUND = 'linear-gradient(180deg, #300050 0%, #1a0030 100%)'; 
-const IS_DARK_THEME = true; // Flag untuk komponen game board
+const IS_DARK_THEME = true;
 
 const containerStyle: React.CSSProperties = {
   display: 'flex',
@@ -42,20 +46,33 @@ const buttonStyle: React.CSSProperties = {
     borderRadius: '8px',
     cursor: 'pointer',
     textDecoration: 'none',
-    display: 'inline-block', // Penting untuk tombol Link
+    display: 'inline-block',
+};
+
+// Tombol Reset Baru
+const resetButton: React.CSSProperties = {
+    ...buttonStyle,
+    backgroundColor: '#D32F2F', // Merah
+    marginRight: '15px',
 };
 
 
 const ChessPage: NextPage = () => {
-    // State untuk menangani Game Over
+    // Gunakan 'key' pada komponen ChessGame untuk memaksa mount/unmount saat reset
+    const [gameKey, setGameKey] = useState(0); 
     const [gameOver, setGameOver] = useState(false);
-    const [result, setResult] = useState<string>('');
+    const [result, setResult] = useState<'You' | 'AI' | 'Draw' | ''>('');
 
-    const handleGameOver = (res: "You" | "AI" | "Draw") => {
+    const handleGameOver = (res: 'You' | 'AI' | 'Draw') => {
         setResult(res);
         setGameOver(true);
-        console.log(`Game Over! Winner: ${res}`);
     };
+    
+    const handleReset = () => {
+        setGameOver(false);
+        setResult('');
+        setGameKey(prevKey => prevKey + 1); // Ganti key untuk mereset ChessGame
+    };
 
     return (
         <div style={containerStyle}>
@@ -63,21 +80,22 @@ const ChessPage: NextPage = () => {
                 <title>Chess vs AI - Farcaster Games</title>
             </Head>
 
-            <h1 style={titleStyle}>♟️ Chess Game (vs AI)</h1>
+            <h1 style={titleStyle}>♟️ Chess Game (vs AI Acak)</h1>
             
-            {/* Tampilkan pesan Game Over atau komponen Game */}
-            {gameOver ? (
-                <div style={{ padding: '40px', backgroundColor: '#300050', borderRadius: '10px', marginTop: '30px' }}>
-                    <h2 style={{ color: '#FFD700', fontSize: '1.5em' }}>Game Over!</h2>
-                    <p style={{ marginTop: '10px' }}>Result: {result === 'You' ? 'You Win!' : result === 'AI' ? 'AI Wins!' : 'It\'s a Draw!'}</p>
-                </div>
-            ) : (
-                <ChessGame onGameOver={handleGameOver} isDarkTheme={IS_DARK_THEME} />
-            )}
+            {/* ChessGame ditampilkan di sini. Gunakan key untuk memaksa render ulang saat reset */}
+            <ChessGame key={gameKey} onGameOver={handleGameOver} isDarkTheme={IS_DARK_THEME} />
             
-            <Link href="/" style={buttonStyle}>
-                Back to Home
-            </Link>
+            {/* Area Tombol Reset dan Navigasi */}
+            <div style={{ marginTop: '20px' }}>
+                {gameOver && (
+                    <button onClick={handleReset} style={resetButton}>
+                        Mulai Ulang Game
+                    </button>
+                )}
+                <Link href="/" style={buttonStyle}>
+                    Kembali ke Home
+                </Link>
+            </div>
         </div>
     );
 };
