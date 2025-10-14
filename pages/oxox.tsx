@@ -1,22 +1,22 @@
-// pages/oxox.tsx (VERSI FINAL DENGAN CSS TERPISAH DAN SHARE FRAME)
+// pages/oxox.tsx
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import React, { useState, useEffect, useCallback } from 'react';
-import '../styles/OXOXPage.css'; // Import CSS baru
+import styles from '../styles/OXOXPage.module.css'; // MENGGUNAKAN CSS MODULES
 
 // --- CONSTANTS ---
 const GRID_SIZE = 5;
-const WINNING_LENGTH = 4;
+const WINNING_LENGTH = 4; // Win condition: 4 consecutive symbols (X or O)
 const PLAYER_SYMBOL = '❌';
 const AI_SYMBOL = '⭕';
 const EMPTY_CELL = null;
 
-// URL Frame Farcaster yang diminta
+// URL Frame Farcaster
 const BASE_FRAME_URL = 'https://farcaster.xyz/miniapps/At9-eGqFG7q4/farcaster-games-hub'; 
 
+
 // --- GAME LOGIC FUNCTIONS ---
-// (checkWinner dan isBoardFull tetap sama)
 
 /**
  * Checks for 4 consecutive symbols (horizontal, vertical, diagonal).
@@ -62,7 +62,7 @@ const checkWinner = (board: (string | null)[][]): string | null => {
     }
 
     return null;
-};
+}; 
 
 /**
  * Checks if the board is full (draw).
@@ -86,7 +86,7 @@ const OXOXPage: NextPage = () => {
   const [statusMessage, setStatusMessage] = useState<string>('Your Turn (❌)');
   const [frameUrl, setFrameUrl] = useState<string>(''); // State baru untuk Frame URL
   
-  // MiniApp ready signal (Important for Farcaster)
+  
   useEffect(() => {
     setStatusMessage(`Your Turn (${PLAYER_SYMBOL})`);
   }, []);
@@ -200,7 +200,7 @@ const OXOXPage: NextPage = () => {
     });
   };
   
-  // Dynamic style untuk grid
+  // Dynamic style untuk grid (tetap inline karena menggunakan variabel GRID_SIZE)
   const gridStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
@@ -213,19 +213,20 @@ const OXOXPage: NextPage = () => {
       <Head>
         <title>OXOX 5x5 - Farcaster Games</title>
       </Head>
-      
-      <div className="oxox-container">
+      
+      <div className={styles['oxox-container']}>
         
-        <h1 className="page-title">❌⭕ OXOX 5x5 vs AI ⭕❌</h1>
+        <h1 className={styles['page-title']}>❌⭕ OXOX 5x5 vs AI ⭕❌</h1>
         
-        <p className="game-status">{statusMessage}</p>
+        <p className={styles['game-status']}>{statusMessage}</p>
 
-        <div className="oxox-grid" style={gridStyle}> {/* Grid style dinamis */}
+        <div className={styles['oxox-grid']} style={gridStyle}>
           {board.flat().map((cell, index) => {
             const r = Math.floor(index / GRID_SIZE);
             const c = index % GRID_SIZE;
             const isClickable = !isGameOver && cell === EMPTY_CELL && currentPlayer === PLAYER_SYMBOL && !isAITurn;
-            const cellClassName = `oxox-cell ${isClickable ? 'oxox-cell-clickable' : 'oxox-cell-disabled'}`;
+            
+            const cellClassName = `${styles['oxox-cell']} ${isClickable ? styles['oxox-cell-clickable'] : styles['oxox-cell-disabled']}`;
 
             return (
               <div 
@@ -242,18 +243,18 @@ const OXOXPage: NextPage = () => {
         {(isGameOver || winner) && (
           <div>
             <button 
-              className="base-button play-again-button"
+              className={`${styles['base-button']} ${styles['play-again-button']}`}
               onClick={resetGame}
             >
               Play Again
             </button>
 
-            {frameUrl && ( // Tampilkan tombol Share hanya jika Frame URL sudah terisi
+            {frameUrl && ( 
               <a
                 href={`https://warpcast.com/~/compose?text=Saya%20bermain%20OXOX%205x5!%20Lihat%20hasil%20saya!&embeds[]=${frameUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="base-button share-button"
+                className={`${styles['base-button']} ${styles['share-button']}`}
               >
                 Bagikan Frame
               </a>
@@ -261,7 +262,7 @@ const OXOXPage: NextPage = () => {
           </div>
         )}
         
-        <Link href="/" className="base-button home-link-button">
+        <Link href="/" className={`${styles['base-button']} ${styles['home-link-button']}`}>
           Back to Main Menu
         </Link>
 

@@ -1,69 +1,67 @@
-// pages/chess.tsx (VERSI FINAL DENGAN CSS TERPISAH)
-import type { NextPage } from 'next';
+// pages/chess.tsx
+import { useState, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import React, { useState, useCallback } from 'react';
-
-// Import komponen ChessGame (sudah diperbaiki sebelumnya)
 import ChessGame from '../components/ChessGame'; 
-// Import file CSS yang baru dibuat
-import '../styles/ChessPage.css'; 
+import styles from '../styles/ChessPage.module.css'; // MENGGUNAKAN CSS MODULES
 
-// --- PAGE COMPONENT ---
-const ChessPage: NextPage = () => {
-    // State untuk menyimpan hasil game (You, AI, Draw, atau null jika sedang bermain)
-    const [gameResult, setGameResult] = useState<'You' | 'AI' | 'Draw' | null>(null);
+// Definisi Tipe Hasil Game
+type GameResult = 'You' | 'AI' | 'Draw' | null;
 
-    const handleGameOver = useCallback((result: 'You' | 'AI' | 'Draw') => {
-        setGameResult(result);
-    }, []);
+const ChessPage = () => {
+  const [gameResult, setGameResult] = useState<GameResult>(null);
+  const [statusMessage, setStatusMessage] = useState<string>('Mulai Game Catur');
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(true); // Untuk kontrol tema jika diperlukan
 
-    const resetGame = useCallback(() => {
-        // Mengatur ulang state untuk me-render ulang ChessGame
-        setGameResult(null); 
-    }, []);
+  const handleGameOver = useCallback((result: 'You' | 'AI' | 'Draw') => {
+    setGameResult(result);
+    if (result === 'You') {
+      setStatusMessage('Checkmate! Anda menang! 🎉');
+    } else if (result === 'AI') {
+      setStatusMessage('Checkmated! Anda kalah. 😭');
+    } else {
+      setStatusMessage('Draw (Seri).');
+    }
+  }, []);
 
-    const statusMessage = gameResult 
-        ? `Game Over! ${gameResult === 'You' ? 'You Won!' : gameResult === 'AI' ? 'AI Won!' : 'Draw!'}`
-        : "White's Turn (w)";
+  const resetGame = useCallback(() => {
+    setGameResult(null);
+    setStatusMessage('Mulai Game Catur');
+  }, []);
 
+  return (
+    <>
+      <Head>
+        <title>Chess - Farcaster Games</title>
+      </Head>
+      
+      <div className={styles['chess-page-container']}> 
+        
+        <h1 className={styles['page-title']}>♟️ Chess vs AI ♚</h1>
+        
+        <p className={styles['game-status']}>{statusMessage}</p>
 
-    return (
-        <>
-            <Head>
-                <title>Chess vs AI - Farcaster Games</title>
-            </Head>
-            
-            {/* Menggunakan class dari ChessPage.css */}
-            <div className="chess-page-container">
-                
-                <h1 className="page-title">♟️ Chess vs AI ♚</h1>
-                
-                <p className="game-status">{statusMessage}</p>
+        <ChessGame 
+          onGameOver={handleGameOver} 
+          isDarkTheme={isDarkTheme}
+        />
 
-                {/* ChessGame tetap di sini */}
-                <ChessGame 
-                    key={gameResult === null ? 'playing' : 'reset'} 
-                    onGameOver={handleGameOver} 
-                    isDarkTheme={true}
-                />
+        {(gameResult !== null) && (
+          <button 
+            className={`${styles['base-button']} ${styles['new-game-button']}`}
+            onClick={resetGame}
+          >
+            Start New Game
+          </button>
+        )}
+        
+        <Link href="/" className={`${styles['base-button']} ${styles['home-link-button']}`}>
+          Back to Main Menu
+        </Link>
 
-                {(gameResult !== null) && (
-                    <button 
-                        className="base-button new-game-button" // Menggunakan class
-                        onClick={resetGame}
-                    >
-                        Start New Game
-                    </button>
-                )}
-                
-                <Link href="/" className="base-button home-link-button">
-                    Back to Main Menu
-                </Link>
-
-            </div>
-        </>
-    );
+      </div>
+    </>
+  );
 };
 
 export default ChessPage;
