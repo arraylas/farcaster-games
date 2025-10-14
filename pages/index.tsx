@@ -1,104 +1,109 @@
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { SiFarcaster } from 'react-icons/si';
+import { GiGamepad } from 'react-icons/gi';
+import { TbTallymark1 } from 'react-icons/tb';
+// FIX: Changed PiChessPawnFill to PiPawnFill as the former is not exported
+import { PiFanFill } from 'react-icons/pi';
 
-// --- Configuration Constants (Updated to Netlify Domain) ---
+// --- Konfigurasi Mini App Farcaster ---
 const APP_DOMAIN = "https://farcaster-games.netlify.app";
-// Ensure this file exists in your /public folder to avoid the broken image error
 const EMBED_IMAGE_URL = `${APP_DOMAIN}/farcaster-games-embed.png`; 
 
+const miniappMetadata = {
+  version: "1",
+  name: "Farcaster Games Hub & Achievements",
+  iconUrl: `${APP_DOMAIN}/icon.png`,
+  homeUrl: APP_DOMAIN,
+  subtitle: "Chess, OXOX, and Onchain Achievement Generator",
+  description: "A combined Mini App featuring single-player games and a tool to generate onchain achievements.",
+  imageUrl: EMBED_IMAGE_URL,
+  buttonTitle: "Launch Farcaster Games",
+  primaryCategory: "games"
+};
+
 export default function Home() {
-  const router = useRouter();
-
-  const navigateToGame = (path: string) => {
-    router.push(path);
-  };
-
-  // Define the Farcaster Mini App metadata object
-  const miniappMetadata = {
-    version: "next",
-    imageUrl: EMBED_IMAGE_URL,
-    button: {
-      title: "Launch Farcaster Games",
-      action: {
-        type: "launch_miniapp",
-        name: "Farcaster Games Hub",
-        url: APP_DOMAIN,
-      },
-    },
-  };
-
   return (
     <>
-      {/* CRITICAL: Farcaster Metadata (OpenGraph & fc:miniapp) 
-        This is what tells Farcaster clients how to render the embed.
-      */}
       <Head>
         <title>Farcaster Games Hub</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Mini App Farcaster untuk Chess dan OXOX. Mainkan game melawan AI dan raih pencapaian onchain." />
         
-        {/* Standard OpenGraph Meta Tags for previews */}
-        <meta property="og:title" content="Farcaster Games Hub: Chess & OXOX" />
-        <meta property="og:description" content="Play Chess and OXOX 5x5 directly inside the Farcaster Mini App." />
+        {/* Farcaster Embed Metadata */}
+        <meta property="og:title" content="Farcaster Games: Chess & OXOX" />
+        <meta property="og:description" content="Mainkan game Chess dan OXOX 5x5 langsung di Farcaster Mini App!" />
         <meta property="og:image" content={EMBED_IMAGE_URL} />
-        <meta property="og:url" content={APP_DOMAIN} />
-
-        {/* Farcaster Mini App Specific Tag */}
+        
+        {/* Farcaster Mini App Tag KRUSIAL */}
         <meta name="fc:miniapp" content={JSON.stringify(miniappMetadata)} />
+        
+        {/* Tailwind config (diasumsikan sudah dimuat) */}
+        <style>
+          {`
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+            body {
+              font-family: 'Inter', sans-serif;
+            }
+          `}
+        </style>
       </Head>
 
-      {/* Main Content (Mencocokkan gaya Gambar 1) */}
-      <div className="min-h-screen bg-[#30064a] text-white flex flex-col items-center justify-center p-4 font-inter">
-        
-        {/* Kontainer Utama yang Ditempatkan di Tengah */}
-        <div className="w-full max-w-md text-center p-4">
+      {/* Latar Belakang Ungu Gelap dan Layout Tengah */}
+      <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#30064a] text-white">
+        <div className="w-full max-w-lg text-center p-8 rounded-xl">
           
-          {/* Judul Utama */}
-          <h1 className="text-4xl font-extrabold mb-4 flex items-center justify-center text-purple-300">
-            <span className="text-4xl mr-3">🎮</span>
-            Farcaster Games
-          </h1>
-          
-          {/* Subtitle/Deskripsi */}
-          <p className="text-center text-gray-300 mb-12 max-w-xs mx-auto">
-            Welcome to Farcaster Games! This is your hub for fun, challenging mini-games built for the Farcaster ecosystem. Start playing against the AI now!
+          {/* Header Aplikasi */}
+          <div className="flex justify-center items-center mb-6">
+            <GiGamepad className="text-4xl text-purple-400 mr-3" />
+            <h1 className="text-4xl font-extrabold tracking-tight text-white">
+              Farcaster Games
+            </h1>
+          </div>
+
+          {/* Deskripsi */}
+          <p className="text-lg mb-8 text-purple-200/90">
+            Selamat datang di Farcaster Games! Ini adalah pusat game mini yang menantang,
+            dirancang untuk ekosistem Farcaster. Mulai bermain melawan AI sekarang!
           </p>
 
-          {/* Header Tombol */}
-          <h2 className="text-2xl font-semibold text-white mb-6">
-            Ready to Play?
+          <h2 className="text-xl font-semibold mb-6 text-purple-300">
+            Siap Bermain?
           </h2>
 
-          {/* Tombol Game */}
-          <div className="space-y-4">
-            <button
-              onClick={() => navigateToGame('/oxox')}
-              // Gaya tombol OXOX (seperti Gambar 1)
-              className="w-full py-4 text-lg font-bold rounded-xl transition duration-300 ease-in-out transform hover:scale-[1.02] bg-green-600 hover:bg-green-700 shadow-xl focus:outline-none focus:ring-4 focus:ring-green-500/50"
+          <div className="flex flex-col space-y-4">
+            
+            {/* Tombol OXOX 5x5 */}
+            <Link 
+              href="/oxox" 
+              className="flex items-center justify-center w-full py-4 px-6 rounded-xl font-bold text-lg 
+                         bg-green-600 hover:bg-green-700 transition duration-300 transform hover:scale-[1.02] 
+                         shadow-lg shadow-green-900/50"
             >
-              ❌⭕ Play OXOX 5x5
-            </button>
-            <button
-              onClick={() => navigateToGame('/chess')}
-              // Gaya tombol Chess (seperti Gambar 1)
-              className="w-full py-4 text-lg font-bold rounded-xl transition duration-300 ease-in-out transform hover:scale-[1.02] bg-blue-600 hover:bg-blue-700 shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-500/50"
+              <TbTallymark1 className="text-2xl mr-2" />
+              Main OXOX 5x5 vs AI
+            </Link>
+
+            {/* Tombol Chess vs AI */}
+            <Link 
+              href="/chess" 
+              className="flex items-center justify-center w-full py-4 px-6 rounded-xl font-bold text-lg 
+                         bg-blue-600 hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] 
+                         shadow-lg shadow-blue-900/50"
             >
-              ♟️ Play Chess vs AI
-            </button>
+              {/* FIX: Use PiPawnFill, as PiChessPawnFill is not exported */}
+              <PiFanFill className="text-2xl mr-2" />
+              Main Catur vs AI
+            </Link>
           </div>
-          
-          {/* Footer */}
-          <p className="text-xs text-center text-gray-500 mt-12">
-            <a 
-              href="https://docs.farcaster.xyz/mini-apps" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-purple-400 underline"
-            >
-              Powered by Farcaster Mini Apps
-            </a>
-          </p>
+
         </div>
-      </div>
+
+        {/* Footer */}
+        <footer className="mt-12 text-sm text-purple-400">
+          Powered by <SiFarcaster className="inline-block mx-1" /> Farcaster Mini Apps
+        </footer>
+      </main>
     </>
   );
 }
