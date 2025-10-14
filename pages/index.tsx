@@ -1,32 +1,28 @@
-import { useEffect, useState } from 'react';
+// pages/index.tsx
+import { useMiniApp } from '@farcaster/mini-app-sdk';
 import { useRouter } from 'next/router';
-import { getUserFID } from '../utils/farcaster'; // sesuaikan utils repo kamu
 
 export default function Home() {
-  const [fid, setFID] = useState<string | null>(null);
+  const { user, isLoading } = useMiniApp();
   const router = useRouter();
 
-  useEffect(() => {
-    // contoh: detect FID dari wallet/session
-    const userFID = getUserFID(); // harus disesuaikan dengan repo utils
-    setFID(userFID);
-  }, []);
-
   const handlePlayClick = () => {
-    router.push('/oxox'); // redirect ke halaman OXOX
+    router.push('/oxox');
   };
 
+  if (isLoading) {
+    return (
+      <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh'}}>
+        <p>Loading user info...</p>
+      </div>
+    );
+  }
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection:'column',
-      justifyContent:'center',
-      alignItems:'center',
-      height:'100vh'
-    }}>
-      {fid ? (
+    <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', height:'100vh'}}>
+      {user ? (
         <>
-          <h2>Welcome, {fid}!</h2>
+          <h2>Welcome, {user.username}!</h2>
           <button 
             onClick={handlePlayClick} 
             style={{
@@ -40,7 +36,7 @@ export default function Home() {
           </button>
         </>
       ) : (
-        <p>Detecting your FID...</p>
+        <p>Please login with Farcaster to play.</p>
       )}
     </div>
   );
