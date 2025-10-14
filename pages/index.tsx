@@ -36,32 +36,32 @@ const IndexPage: NextPage = () => {
       </Head>
 
       <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-indigo-800 to-purple-900 text-white p-6">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow-lg text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-6 drop-shadow-lg text-center">
           🎮 Farcaster Achievement
         </h1>
 
-        <p className="max-w-md text-center text-lg mb-10 opacity-90">
+        <p className="max-w-md text-center text-lg mb-12 opacity-90">
           Generate your onchain achievements or play fun mini-games built for
           Farcaster Frames!
         </p>
 
-        <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+        <div className="flex flex-col items-center w-full max-w-sm space-y-8">
           <Link
             href="/oxox"
-            className="w-full bg-green-600 hover:bg-green-700 text-center p-4 rounded-lg text-lg font-semibold shadow-md transition-all"
+            className="w-full bg-green-600 hover:bg-green-700 text-center p-4 rounded-xl text-lg font-semibold shadow-lg transition-all"
           >
             ❌⭕ Play OXOX 5x5
           </Link>
 
           <Link
             href="/chess"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-center p-4 rounded-lg text-lg font-semibold shadow-md transition-all"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-center p-4 rounded-xl text-lg font-semibold shadow-lg transition-all"
           >
             ♟️ Play Chess vs AI
           </Link>
         </div>
 
-        <p className="mt-10 text-base text-center font-medium opacity-80">
+        <p className="mt-12 text-base text-center font-medium opacity-80">
           🚀 More Games Coming Soon...
         </p>
 
