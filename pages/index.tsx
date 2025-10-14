@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
 
-// Basic inline styling for a clean, Farcaster-themed landing page
+// Basic inline styling
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -15,7 +15,7 @@ const containerStyle: React.CSSProperties = {
 };
 
 const titleStyle: React.CSSProperties = {
-  color: '#635BFF', // Farcaster-like purple/blue
+  color: '#635BFF',
   marginBottom: '10px',
 };
 
@@ -40,22 +40,20 @@ const linkStyle: React.CSSProperties = {
 const IndexPage: NextPage = () => {
   return (
     <div style={containerStyle}>
-      <h1 style={titleStyle}>Welcome to the Farcaster Achievement MiniApp 🏅</h1>
+      <h1 style={titleStyle}>Welcome to the Tictactoe MiniApp 🎮</h1>
       
       <p style={paragraphStyle}>
-        This is the landing page for your MiniApp. The Farcaster SDK has been initialized in 
-        `_app.tsx` and is ready to use for connecting user context or achievements.
+        This MiniApp features a challenging 5x5 XOXO game against the computer. See if you can get four in a row!
       </p>
       
       <h2>Ready to Play?</h2>
       
-      {/* Button linking to the XOXO 9x9 game page */}
       <Link href="/oxox" style={linkStyle}>
-        Start XOXO 9x9 Game 🎮
+        Start 5x5 Game
       </Link>
 
       <p style={{ marginTop: '50px', fontSize: '0.9em', color: '#888' }}>
-        *Check your browser console for the Farcaster SDK initialization status.*
+        *Remember: four in a row wins!*
       </p>
     </div>
   );
