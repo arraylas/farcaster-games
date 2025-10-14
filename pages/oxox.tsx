@@ -123,10 +123,10 @@ const TicTacToe5x5: NextPage = () => {
   const gameActive = !winner && !isDraw;
 
   const status = winner
-    ? `Winner: ${winner}!`
+    ? `🏆 ${winner === "X" ? "You Win!" : "Computer Wins!"}`
     : isDraw
-    ? `It's a Draw!`
-    : `Next player: ${isXNext ? "You (X)" : "Computer (O)"}`;
+    ? `🤝 It's a Draw!`
+    : `Next Player: ${isXNext ? "You (X)" : "Computer (O)"}`;
 
   const makeMove = useCallback(
     (index: number) => {
@@ -154,22 +154,22 @@ const TicTacToe5x5: NextPage = () => {
     if (isXNext) makeMove(index);
   };
 
-  const resetGame = () => {
+  const restartGame = () => {
     setBoardState(Array(BOARD_SIZE * BOARD_SIZE).fill(null));
     setIsXNext(true);
   };
 
   // === 🟣 Share to Warpcast ===
   const handleShareCast = () => {
-    const appUrl = "https://farcaster-achivement.vercel.app/oxox"; // Ganti dengan domain kamu
+    const appUrl = "https://farcaster.xyz/miniapps/9HwP06is7xxa/farcaster-achievement";
     let message = "";
 
-    if (winner) {
-      message = `I just won as ${winner} in the XOXO 5x5 Farcaster MiniApp! Can you beat me? Play here: ${appUrl}`;
+    if (winner === "X") {
+      message = `🏆 I beat the AI in OXOX 5x5! Play it yourself here: ${appUrl}`;
+    } else if (winner === "O") {
+      message = `💀 The AI defeated me in OXOX 5x5! Try your luck: ${appUrl}`;
     } else if (isDraw) {
-      message = `It was a draw in the XOXO 5x5 Farcaster MiniApp! Try your luck: ${appUrl}`;
-    } else {
-      message = `Check out this XOXO 5x5 MiniApp! Play against the computer: ${appUrl}`;
+      message = `🤝 It's a draw in OXOX 5x5! Play here: ${appUrl}`;
     }
 
     const farcasterCastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(
@@ -178,9 +178,14 @@ const TicTacToe5x5: NextPage = () => {
     window.open(farcasterCastUrl, "_blank");
   };
 
+  const backToHome = () => {
+    window.location.href = "/";
+  };
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>XOXO 5x5 (4-in-a-row VS Computer)</h1>
+      <h1 className={styles.title}>❌⭕ OXOX 5x5 (4-in-a-row vs AI)</h1>
+
       <div className={styles.status}>{status}</div>
 
       <div
@@ -195,34 +200,25 @@ const TicTacToe5x5: NextPage = () => {
         ))}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <button onClick={resetGame} className={styles.resetButton}>
-          Restart Game
-        </button>
+      {(winner || isDraw) && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "20px" }}>
+          <button onClick={handleShareCast} className={styles.shareButton}>
+            📤 Share to Warpcast
+          </button>
 
-        {(winner || isDraw) && (
-          <>
-            <button
-              onClick={handleShareCast}
-              className={styles.shareButton}
-              style={{ marginTop: "10px" }}
-            >
-              Share to Warpcast 🎙️
-            </button>
+          <button onClick={restartGame} className={styles.resetButton} style={{ marginTop: "10px" }}>
+            🔁 Restart Game
+          </button>
 
-            <button
-              onClick={() => (window.location.href = "/")}
-              className={styles.resetButton}
-              style={{
-                backgroundColor: "#635BFF",
-                marginTop: "10px",
-              }}
-            >
-              Back to Menu 🏠
-            </button>
-          </>
-        )}
-      </div>
+          <button
+            onClick={backToHome}
+            className={styles.resetButton}
+            style={{ backgroundColor: "#635BFF", marginTop: "10px" }}
+          >
+            🔙 Back to Home
+          </button>
+        </div>
+      )}
     </div>
   );
 };

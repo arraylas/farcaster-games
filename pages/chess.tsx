@@ -15,17 +15,20 @@ export default function ChessPage() {
     window.location.href = "/";
   };
 
+  const restartGame = () => {
+    setFinished(false);
+    setWinner(null);
+  };
+
   const shareToWarpcast = () => {
+    const url = "https://farcaster.xyz/miniapps/9HwP06is7xxa/farcaster-achievement";
     const text =
       winner === "You"
         ? "🏆 I beat the AI in Farcaster Chess!"
         : winner === "AI"
         ? "💀 The AI checkmated me in Farcaster Chess!"
         : "🤝 It's a draw against the AI in Farcaster Chess!";
-    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(
-      text + " ♟️ #FarcasterGames"
-    )}`;
-    window.open(url, "_blank");
+    window.open(`${url}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (
@@ -34,40 +37,38 @@ export default function ChessPage() {
         ♟️ Chess Game (vs AI)
       </h1>
 
-      {/* ChessGame accepts onGameOver callback */}
       {!finished ? (
         <ChessGame onGameOver={handleGameOver} />
       ) : (
-        <div className="w-full max-w-md mx-auto text-center mt-6">
-          <h2 className="text-xl font-semibold mb-4">
-            {winner === "Draw" ? "🤝 It's a Draw!" : winner === "You" ? "🏆 You Win!" : "💀 AI Wins!"}
+        <div className="w-full max-w-md mx-auto text-center mt-8">
+          <h2 className="text-xl font-semibold mb-6">
+            {winner === "Draw"
+              ? "🤝 It's a Draw!"
+              : winner === "You"
+              ? "🏆 You Win!"
+              : "💀 AI Wins!"}
           </h2>
 
           <div className="flex flex-col gap-3 items-center">
             <button
               onClick={shareToWarpcast}
-              className="w-48 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold"
+              className="w-56 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold"
             >
               📤 Share to Warpcast
             </button>
 
             <button
-              onClick={resetToHome}
-              className="w-48 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold"
+              onClick={restartGame}
+              className="w-56 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
             >
-              🔙 Back to Menu
+              🔁 Restart Game
             </button>
 
             <button
-              onClick={() => {
-                setFinished(false);
-                setWinner(null);
-                // reload page to reset chess component (simple)
-                window.location.reload();
-              }}
-              className="w-48 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
+              onClick={resetToHome}
+              className="w-56 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold"
             >
-              🔁 Restart Game
+              🔙 Back to Home
             </button>
           </div>
         </div>

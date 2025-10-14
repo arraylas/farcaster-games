@@ -46,6 +46,7 @@ const pieceToChar = (p: Piece) => {
   return map[p] ?? "?";
 };
 
+// Basic move generator
 const generateMoves = (board: Piece[], side: "w" | "b") => {
   const moves: Move[] = [];
   for (let i = 0; i < 64; i++) {
@@ -65,8 +66,7 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
     };
 
     const slide = (dr: number, dc: number) => {
-      let rr = r + dr,
-        cc = c + dc;
+      let rr = r + dr, cc = c + dc;
       while (inBounds(rr, cc)) {
         const idx = rcToIndex(rr, cc);
         if (!board[idx]) moves.push({ from: i, to: idx });
@@ -76,8 +76,7 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
             moves.push({ from: i, to: idx });
           break;
         }
-        rr += dr;
-        cc += dc;
+        rr += dr; cc += dc;
       }
     };
 
@@ -92,7 +91,6 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
             moves.push({ from: i, to: rcToIndex(one, c), promotion: pr })
           );
         else moves.push({ from: i, to: rcToIndex(one, c) });
-
         if (r === start && !board[rcToIndex(r + 2 * dir, c)])
           moves.push({ from: i, to: rcToIndex(r + 2 * dir, c) });
       }
@@ -110,36 +108,19 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
       }
     } else if (kind === "N") {
       for (const [dr, dc] of [
-        [-2, -1],
-        [-2, 1],
-        [-1, -2],
-        [-1, 2],
-        [1, -2],
-        [1, 2],
-        [2, -1],
-        [2, 1],
-      ])
-        add(r + dr, c + dc);
+        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
+        [1, -2], [1, 2], [2, -1], [2, 1],
+      ]) add(r + dr, c + dc);
     } else if (kind === "B") {
-      [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) => slide(dr, dc));
+      [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr, dc]) => slide(dr, dc));
     } else if (kind === "R") {
-      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => slide(dr, dc));
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr, dc]) => slide(dr, dc));
     } else if (kind === "Q") {
-      [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-        [1, 1],
-        [1, -1],
-        [-1, 1],
-        [-1, -1],
-      ].forEach(([dr, dc]) => slide(dr, dc));
+      [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr, dc]) => slide(dr, dc));
     } else if (kind === "K") {
-      for (const dr of [-1, 0, 1])
-        for (const dc of [-1, 0, 1]) {
+      for (const dr of [-1,0,1])
+        for (const dc of [-1,0,1])
           if (dr || dc) add(r + dr, c + dc);
-        }
     }
   }
   return moves;
@@ -154,14 +135,7 @@ const makeMove = (board: Piece[], move: Move): Piece[] => {
   return newB;
 };
 
-const pieceValue: Record<string, number> = {
-  K: 900,
-  Q: 90,
-  R: 50,
-  B: 30,
-  N: 30,
-  P: 10,
-};
+const pieceValue: Record<string, number> = { K:900, Q:90, R:50, B:30, N:30, P:10 };
 const evaluateBoard = (board: Piece[]): number => {
   let score = 0;
   for (const p of board) {
@@ -183,7 +157,6 @@ const minimax = (
   const side = maximizing ? "b" : "w";
   const moves = generateMoves(board, side);
   if (moves.length === 0) return evaluateBoard(board);
-
   if (maximizing) {
     let maxEval = -Infinity;
     for (const m of moves) {
@@ -241,6 +214,7 @@ export default function ChessGame({ onGameOver }: ChessGameProps) {
     }
   };
 
+  // AI turn
   useEffect(() => {
     if (turn === "b") {
       const best = findBestMove(board, 2);
@@ -254,6 +228,7 @@ export default function ChessGame({ onGameOver }: ChessGameProps) {
     }
   }, [turn]);
 
+  // Detect game over
   useEffect(() => {
     const whiteKing = board.includes("wK");
     const blackKing = board.includes("bK");
@@ -263,27 +238,29 @@ export default function ChessGame({ onGameOver }: ChessGameProps) {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="grid grid-cols-8 border-4 border-gray-600 rounded-lg">
-        {[...board].reverse().map((p, idx) => {
-          const actualIndex = 63 - idx;
-          const [r, c] = indexToRC(actualIndex);
+      <div
+        className="grid grid-cols-8 border-4 border-gray-700 rounded-xl overflow-hidden shadow-lg"
+        style={{ width: "min(90vw, 480px)" }}
+      >
+        {board.map((p, idx) => {
+          const [r, c] = indexToRC(idx);
           const dark = (r + c) % 2 === 1;
           return (
             <div
-              key={actualIndex}
-              onClick={() => handleClick(actualIndex)}
-              className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-2xl sm:text-3xl cursor-pointer select-none 
-                ${dark ? "bg-green-700" : "bg-green-200"} 
-                ${selected === actualIndex ? "ring-4 ring-yellow-400" : ""} 
+              key={idx}
+              onClick={() => handleClick(idx)}
+              className={`flex items-center justify-center cursor-pointer text-2xl sm:text-3xl select-none transition-all
+                ${dark ? "bg-green-700" : "bg-green-200"}
+                ${selected === idx ? "ring-4 ring-yellow-400" : ""}
                 ${p && isWhite(p) ? "text-white" : p ? "text-black" : ""}
-              `}
+                aspect-square`}
             >
               {pieceToChar(p)}
             </div>
           );
         })}
       </div>
-      <p className="mt-3 text-sm opacity-80">You are playing as <b>White</b></p>
+      <p className="mt-3 text-sm opacity-80 text-center">You are playing as <b>White</b></p>
     </div>
   );
 }
