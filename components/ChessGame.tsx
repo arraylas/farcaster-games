@@ -1,12 +1,14 @@
+// components/ChessGame.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 
 type Piece = string | null;
 type Move = { from: number; to: number; promotion?: string | null };
 
+const cloneBoard = (b: Piece[]) => b.slice();
+const inBounds = (r: number, c: number) => r >= 0 && r < 8 && c >= 0 && c < 8;
 const rcToIndex = (r: number, c: number) => r * 8 + c;
 const indexToRC = (i: number) => [Math.floor(i / 8), i % 8];
-const inBounds = (r: number, c: number) => r >= 0 && r < 8 && c >= 0 && c < 8;
 const isWhite = (p: Piece) => !!p && p.startsWith("w");
 const isBlack = (p: Piece) => !!p && p.startsWith("b");
 
@@ -25,12 +27,23 @@ const initialBoard = (): Piece[] => {
 const pieceToChar = (p: Piece) => {
   if (!p) return "";
   const map: Record<string, string> = {
-    wK: "♔", wQ: "♕", wR: "♖", wB: "♗", wN: "♘", wP: "♙",
-    bK: "♚", bQ: "♛", bR: "♜", bB: "♝", bN: "♞", bP: "♟︎",
+    wK: "♔",
+    wQ: "♕",
+    wR: "♖",
+    wB: "♗",
+    wN: "♘",
+    wP: "♙",
+    bK: "♚",
+    bQ: "♛",
+    bR: "♜",
+    bB: "♝",
+    bN: "♞",
+    bP: "♟︎",
   };
   return map[p] ?? "?";
 };
 
+// simplified move generation (no castling/en-passant checks)
 const generateMoves = (board: Piece[], side: "w" | "b") => {
   const moves: Move[] = [];
   for (let i = 0; i < 64; i++) {
@@ -45,19 +58,18 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
       if (!inBounds(rr, cc)) return;
       const idx = rcToIndex(rr, cc);
       const t = board[idx];
-      if (!t || (side === "w" ? isBlack(t) : isWhite(t)))
-        moves.push({ from: i, to: idx });
+      if (!t || (side === "w" ? isBlack(t) : isWhite(t))) moves.push({ from: i, to: idx });
     };
 
     const slide = (dr: number, dc: number) => {
-      let rr = r + dr, cc = c + dc;
+      let rr = r + dr,
+        cc = c + dc;
       while (inBounds(rr, cc)) {
         const idx = rcToIndex(rr, cc);
         if (!board[idx]) moves.push({ from: i, to: idx });
         else {
           const t = board[idx];
-          if (t && (side === "w" ? isBlack(t) : isWhite(t)))
-            moves.push({ from: i, to: idx });
+          if (t && (side === "w" ? isBlack(t) : isWhite(t))) moves.push({ from: i, to: idx });
           break;
         }
         rr += dr;
@@ -65,7 +77,6 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
       }
     };
 
-    // simple pawn/rook/etc logic
     if (kind === "P") {
       const dir = side === "w" ? -1 : 1;
       const one = r + dir;
@@ -74,18 +85,28 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
         const cc = c + dc;
         if (!inBounds(one, cc)) continue;
         const t = board[rcToIndex(one, cc)];
-        if (t && (side === "w" ? isBlack(t) : isWhite(t)))
-          moves.push({ from: i, to: rcToIndex(one, cc) });
+        if (t && (side === "w" ? isBlack(t) : isWhite(t))) moves.push({ from: i, to: rcToIndex(one, cc) });
       }
     } else if (kind === "N") {
-      for (const [dr, dc] of [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]])
+      for (const [dr, dc] of [
+        [-2, -1],
+        [-2, 1],
+        [-1, -2],
+        [-1, 2],
+        [1, -2],
+        [1, 2],
+        [2, -1],
+        [2, 1],
+      ])
         add(r + dr, c + dc);
     } else if (kind === "B") {
       [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) => slide(dr, dc));
     } else if (kind === "R") {
       [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => slide(dr, dc));
     } else if (kind === "Q") {
-      [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) => slide(dr, dc));
+      [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) =>
+        slide(dr, dc)
+      );
     } else if (kind === "K") {
       for (const dr of [-1, 0, 1]) for (const dc of [-1, 0, 1]) if (dr || dc) add(r + dr, c + dc);
     }
@@ -94,16 +115,17 @@ const generateMoves = (board: Piece[], side: "w" | "b") => {
 };
 
 const makeMove = (board: Piece[], move: Move): Piece[] => {
-  const newB = [...board];
+  const newB = cloneBoard(board);
   const piece = newB[move.from];
   newB[move.from] = null;
   newB[move.to] = piece;
   return newB;
 };
 
-const findBestMove = (board: Piece[]): Move | null => {
+// very simple AI: choose random legal move for black
+const findBestMove = (board: Piece[]) => {
   const moves = generateMoves(board, "b");
-  if (moves.length === 0) return null;
+  if (!moves.length) return null;
   return moves[Math.floor(Math.random() * moves.length)];
 };
 
@@ -115,6 +137,34 @@ export default function ChessGame({
   const [board, setBoard] = useState<Piece[]>(initialBoard);
   const [turn, setTurn] = useState<"w" | "b">("w");
   const [selected, setSelected] = useState<number | null>(null);
+  const [aiThinking, setAiThinking] = useState(false);
+
+  useEffect(() => {
+    // quick game-over check by king presence
+    const whiteKing = board.includes("wK");
+    const blackKing = board.includes("bK");
+    if (!whiteKing && onGameOver) onGameOver("AI");
+    if (!blackKing && onGameOver) onGameOver("You");
+  }, [board, onGameOver]);
+
+  useEffect(() => {
+    if (turn === "b") {
+      setAiThinking(true);
+      const mv = findBestMove(board);
+      if (!mv) {
+        setTimeout(() => {
+          setAiThinking(false);
+          if (onGameOver) onGameOver("Draw");
+        }, 300);
+        return;
+      }
+      setTimeout(() => {
+        setBoard((prev) => makeMove(prev, mv));
+        setTurn("w");
+        setAiThinking(false);
+      }, 600);
+    }
+  }, [turn, board, onGameOver]);
 
   const handleClick = (i: number) => {
     if (turn !== "w") return;
@@ -133,43 +183,51 @@ export default function ChessGame({
     }
   };
 
-  // AI turn
-  useEffect(() => {
-    const whiteKing = board.includes("wK");
-    const blackKing = board.includes("bK");
-    if (!whiteKing && onGameOver) onGameOver("AI");
-    if (!blackKing && onGameOver) onGameOver("You");
-
-    if (turn === "b") {
-      const mv = findBestMove(board);
-      if (!mv && onGameOver) onGameOver("Draw");
-      if (mv) {
-        const newB = makeMove(board, mv);
-        setTimeout(() => {
-          setBoard(newB);
-          setTurn("w");
-        }, 600);
-      }
-    }
-  }, [turn]);
-
+  // BOARD STYLES:
+  // wrapper forces a square area (aspect-ratio) and grid layout 8x8
   return (
-    <div className="grid grid-cols-8 border-4 border-gray-700 rounded-xl shadow-lg overflow-hidden max-w-[480px] mx-auto">
-      {board.map((p, i) => {
-        const [r, c] = indexToRC(i);
-        const dark = (r + c) % 2 === 1;
-        return (
-          <div
-            key={i}
-            onClick={() => handleClick(i)}
-            className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center text-2xl sm:text-3xl cursor-pointer select-none ${
-              dark ? "bg-green-700" : "bg-green-200"
-            } ${selected === i ? "ring-4 ring-yellow-400" : ""}`}
-          >
-            {pieceToChar(p)}
-          </div>
-        );
-      })}
+    <div className="w-full max-w-[520px] mx-auto">
+      <div className="text-center mb-3">
+        <div className="text-sm opacity-80">{aiThinking ? "AI thinking..." : "Your turn (White)"}</div>
+      </div>
+
+      <div
+        className="mx-auto bg-gray-800 p-2 rounded-lg"
+        style={{
+          aspectRatio: "1 / 1",
+          display: "grid",
+          gridTemplateColumns: "repeat(8, 1fr)",
+          gap: "2px",
+          maxWidth: "520px",
+        }}
+      >
+        {board.map((p, i) => {
+          const [r, c] = indexToRC(i);
+          const dark = (r + c) % 2 === 1;
+          const isSelected = selected === i;
+          return (
+            <div
+              key={i}
+              onClick={() => handleClick(i)}
+              role="button"
+              aria-label={`Square ${i}`}
+              className={`flex items-center justify-center select-none cursor-pointer transition-all`}
+              style={{
+                backgroundColor: isSelected ? "#facc15" : dark ? "#2b6b2b" : "#e6f4ea",
+                color: dark ? "#e6f4ea" : "#0b1a0b",
+                fontSize: "1.35rem",
+                userSelect: "none",
+              }}
+            >
+              <span style={{ lineHeight: 1 }}>{pieceToChar(p)}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-3 text-center">
+        <div className="text-sm opacity-80">You are playing as <strong>White</strong></div>
+      </div>
     </div>
   );
 }
