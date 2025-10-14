@@ -1,14 +1,5 @@
 /* styles/OXOXPage.css */
 
-/* --- CONSTANTS & BASE --- */
-:root {
-    --background-color: #300050; /* Dark Purple */
-    --light-blue: #90CAF9;
-    --light-purple: #E0B0FF;
-    --dark-cell: #3a065f;
-    --dark-border: #1a0030;
-}
-
 /* Style untuk container utama */
 .oxox-container {
     display: flex;

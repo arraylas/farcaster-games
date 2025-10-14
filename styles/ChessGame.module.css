@@ -1,13 +1,5 @@
 /* styles/ChessPage.css */
 
-/* --- CONSTANTS & BASE --- */
-:root {
-    --background-color: #300050; /* Dark Purple */
-    --light-purple: #E0B0FF;
-    --light-blue: #90CAF9;
-    --dark-color: #300050;
-}
-
 /* Style untuk container utama */
 .chess-page-container {
     display: flex;
