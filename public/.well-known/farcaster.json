@@ -10,6 +10,9 @@
     "primaryCategory": "utility",
     "splashBackgroundColor": "#eeccff"
   },
+  "baseBuilder": {
+    "allowedAddresses": ["0x14c6a3fb0fa46a43d01dc7426d7c27cf8c71c10a"]
+  },
   "accountAssociation": {
     "header": "eyJmaWQiOjI5Mjg4MywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDE0QzZBM0ZiMGZhNDZBNDNkMDFEQzc0MjZEN2MyN2NmOEM3MWMxMGEifQ",
     "payload": "eyJkb21haW4iOiJmYXJjYXN0ZXItYWNoaXZlbWVudC52ZXJjZWwuYXBwIn0",
