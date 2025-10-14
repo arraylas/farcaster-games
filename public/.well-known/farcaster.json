@@ -1,15 +1,27 @@
 {
-  "frame": {
-    "name": "Farcaster Achievement",
-    "homeUrl": "https://farcaster-achivement.vercel.app/",
-    "iconUrl": "https://farcaster-achivement.vercel.app/icon.png",
-    "version": "1",
-    "subtitle": "Generate onchain achievements",
-    "description": "Generate achievement image from your Farcaster history",
-    "splashImageUrl": "https://farcaster-achivement.vercel.app/splash.png",
-    "primaryCategory": "utility",
-    "splashBackgroundColor": "#eeccff"
-  },
+  "name": "Farcaster Games Hub & Achievements",
+  "iconUrl": "https://farcaster-games.netlify.app/icon.png",
+  "homeUrl": "https://farcaster-games.netlify.app/",
+  "version": "1",
+  "subtitle": "Chess, OXOX, and Onchain Achievement Generator",
+  "description": "A combined Mini App featuring single-player games (Chess, OXOX 5x5) and a tool to generate onchain achievement images from your Farcaster history.",
+  "primaryCategory": "games",
+  "tags": [
+    "chess",
+    "games",
+    "achievement",
+    "utility",
+    "farcaster"
+  ],
+  "tagline": "Play games and visualize your Farcaster journey.",
+  "buttonTitle": "Launch Mini App",
+  "ogTitle": "Farcaster Games & Achievements",
+  "ogDescription": "Play games or generate your onchain achievements instantly.",
+  "ogImageUrl": "https://farcaster-games.netlify.app/splash.png",
+  "castShareUrl": "https://farcaster-games.netlify.app/",
+
+  "splashImageUrl": "https://farcaster-games.netlify.app/splash.png",
+  "splashBackgroundColor": "#eeccff",
   "baseBuilder": {
     "allowedAddresses": ["0x14c6a3fb0fa46a43d01dc7426d7c27cf8c71c10a"]
   },
@@ -18,5 +30,4 @@
     "payload": "eyJkb21haW4iOiJmYXJjYXN0ZXItYWNoaXZlbWVudC52ZXJjZWwuYXBwIn0",
     "signature": "MHhhZDBkMjFiODNjYjdhMWZjNTA1ZWRiOTUzYTczYjFlMzExMTUwMWIyMjJmMDkzOTNkMjk4Mjg4NDI2NjVhMzkyNTQ0YWIzMDM0NmViMDJhZGVkOGE2NWViYTQ4OThlODE0ZDgzN2EwNzE4YjcwNDNlYTlmNmZkY2IzMDIyNDRiODFi"
   }
-
 }
