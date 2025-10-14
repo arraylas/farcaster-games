@@ -1,177 +1,114 @@
-"use client";
-import React, { useEffect, useState } from "react";
-
-type Piece = string | null;
-type Move = { from: number; to: number; promotion?: string | null };
+import React, { useState, useEffect } from "react";
+import { Chess } from "chess.js";
 
 interface ChessGameProps {
   onGameOver: (result: "You" | "AI" | "Draw") => void;
 }
 
-const cloneBoard = (b: Piece[]) => b.slice();
-const inBounds = (r: number, c: number) => r >= 0 && r < 8 && c >= 0 && c < 8;
-const rcToIndex = (r: number, c: number) => r * 8 + c;
-const indexToRC = (i: number) => [Math.floor(i / 8), i % 8];
-const isWhite = (p: Piece) => !!p && p.startsWith("w");
-const isBlack = (p: Piece) => !!p && p.startsWith("b");
-
-const initialBoard = (): Piece[] => {
-  const b: Piece[] = new Array(64).fill(null);
-  const back = ["R", "N", "B", "Q", "K", "B", "N", "R"];
-  for (let i = 0; i < 8; i++) {
-    b[i] = "b" + back[i];
-    b[8 + i] = "bP";
-    b[48 + i] = "wP";
-    b[56 + i] = "w" + back[i];
-  }
-  return b;
-};
-
-const pieceToChar = (p: Piece) => {
-  if (!p) return "";
-  const map: Record<string, string> = {
-    wK: "♔",
-    wQ: "♕",
-    wR: "♖",
-    wB: "♗",
-    wN: "♘",
-    wP: "♙",
-    bK: "♚",
-    bQ: "♛",
-    bR: "♜",
-    bB: "♝",
-    bN: "♞",
-    bP: "♟︎",
+const pieceToChar = (piece: any) => {
+  const symbols: Record<string, string> = {
+    p: "♟︎",
+    r: "♜",
+    n: "♞",
+    b: "♝",
+    q: "♛",
+    k: "♚",
+    P: "♙",
+    R: "♖",
+    N: "♘",
+    B: "♗",
+    Q: "♕",
+    K: "♔",
   };
-  return map[p] ?? "?";
+  return symbols[piece?.type ? (piece.color === "w" ? piece.type.toUpperCase() : piece.type) : ""] || "";
 };
 
-const generateMoves = (board: Piece[], side: "w" | "b") => {
-  const moves: Move[] = [];
-  for (let i = 0; i < 64; i++) {
-    const p = board[i];
-    if (!p) continue;
-    if (side === "w" && !isWhite(p)) continue;
-    if (side === "b" && !isBlack(p)) continue;
-    const [r, c] = indexToRC(i);
-    const kind = p[1];
+const isWhite = (piece: any) => piece?.color === "w";
 
-    const add = (rr: number, cc: number) => {
-      if (!inBounds(rr, cc)) return;
-      const idx = rcToIndex(rr, cc);
-      const t = board[idx];
-      if (!t || (side === "w" ? isBlack(t) : isWhite(t))) moves.push({ from: i, to: idx });
-    };
+const ChessGame: React.FC<ChessGameProps> = ({ onGameOver }) => {
+  const [game] = useState(new Chess());
+  const [board, setBoard] = useState(game.board());
+  const [selected, setSelected] = useState<[number, number] | null>(null);
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
 
-    const slide = (dr: number, dc: number) => {
-      let rr = r + dr, cc = c + dc;
-      while (inBounds(rr, cc)) {
-        const idx = rcToIndex(rr, cc);
-        if (!board[idx]) moves.push({ from: i, to: idx });
-        else {
-          const t = board[idx];
-          if (t && (side === "w" ? isBlack(t) : isWhite(t))) moves.push({ from: i, to: idx });
-          break;
-        }
-        rr += dr;
-        cc += dc;
+  const makeAiMove = () => {
+    const moves = game.moves();
+    if (moves.length === 0) {
+      if (game.isCheckmate()) onGameOver("You");
+      else onGameOver("Draw");
+      return;
+    }
+
+    const move = moves[Math.floor(Math.random() * moves.length)];
+    game.move(move);
+    setBoard(game.board());
+    setIsPlayerTurn(true);
+
+    if (game.isCheckmate()) onGameOver("AI");
+    else if (game.isDraw()) onGameOver("Draw");
+  };
+
+  const handleSquareClick = (r: number, c: number) => {
+    if (!isPlayerTurn) return;
+
+    if (selected) {
+      const [sr, sc] = selected;
+      const move = {
+        from: `${"abcdefgh"[sc]}${8 - sr}`,
+        to: `${"abcdefgh"[c]}${8 - r}`,
+      };
+      const result = game.move(move);
+      if (result) {
+        setBoard(game.board());
+        setSelected(null);
+        setIsPlayerTurn(false);
+        if (game.isCheckmate()) onGameOver("You");
+        else if (game.isDraw()) onGameOver("Draw");
+        else setTimeout(makeAiMove, 500);
+      } else {
+        setSelected(null);
       }
-    };
-
-    if (kind === "P") {
-      const dir = side === "w" ? -1 : 1;
-      const start = side === "w" ? 6 : 1;
-      const promote = side === "w" ? 0 : 7;
-      const one = r + dir;
-      if (inBounds(one, c) && !board[rcToIndex(one, c)]) {
-        if (one === promote)
-          ["Q", "R", "B", "N"].forEach((pr) => moves.push({ from: i, to: rcToIndex(one, c), promotion: pr }));
-        else moves.push({ from: i, to: rcToIndex(one, c) });
-        if (r === start && !board[rcToIndex(r + 2 * dir, c)]) moves.push({ from: i, to: rcToIndex(r + 2 * dir, c) });
-      }
-      for (const dc of [-1, 1]) {
-        const cc = c + dc;
-        if (!inBounds(one, cc)) continue;
-        const t = board[rcToIndex(one, cc)];
-        if (t && (side === "w" ? isBlack(t) : isWhite(t))) moves.push({ from: i, to: rcToIndex(one, cc) });
-      }
-    } else if (kind === "N") {
-      for (const [dr, dc] of [
-        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
-        [1, -2], [1, 2], [2, -1], [2, 1],
-      ]) add(r + dr, c + dc);
-    } else if (kind === "B") [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) => slide(dr, dc));
-    else if (kind === "R") [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => slide(dr, dc));
-    else if (kind === "Q") [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr, dc]) => slide(dr, dc));
-    else if (kind === "K") for (const dr of [-1, 0, 1]) for (const dc of [-1, 0, 1]) if (dr || dc) add(r + dr, c + dc);
-  }
-  return moves;
-};
-
-const makeMove = (board: Piece[], move: Move): Piece[] => {
-  const newB = cloneBoard(board);
-  const piece = newB[move.from];
-  newB[move.from] = null;
-  newB[move.to] = piece;
-  return newB;
-};
-
-export default function ChessGame({ onGameOver }: ChessGameProps) {
-  const [board, setBoard] = useState<Piece[]>(initialBoard);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [turn, setTurn] = useState<"w" | "b">("w");
-
-  const handleClick = (i: number) => {
-    if (turn !== "w") return;
-    const piece = board[i];
-    if (selected === null) {
-      if (piece && isWhite(piece)) setSelected(i);
     } else {
-      const moves = generateMoves(board, "w");
-      const mv = moves.find((m) => m.from === selected && m.to === i);
-      if (mv) {
-        const newBoard = makeMove(board, mv);
-        setBoard(newBoard);
-        setTurn("b");
+      const piece = board[r][c];
+      if (piece && isWhite(piece)) {
+        setSelected([r, c]);
       }
-      setSelected(null);
     }
   };
 
-  // === LAYOUT FIX di sini ===
+  useEffect(() => {
+    setBoard(game.board());
+  }, [game]);
+
   return (
-    <div className="flex flex-col items-center">
-      <div
-        className="grid grid-cols-8 border-4 border-gray-700 rounded-xl overflow-hidden shadow-lg"
-        style={{
-          width: "min(90vw, 480px)",   // batasi lebar total
-          aspectRatio: "1 / 1",         // bikin kotak persegi total
-          display: "grid",
-          gridTemplateColumns: "repeat(8, 1fr)",
-          gridTemplateRows: "repeat(8, 1fr)",
-        }}
-      >
-        {board.map((p, idx) => {
-          const [r, c] = indexToRC(idx);
-          const dark = (r + c) % 2 === 1;
-          return (
-            <div
-              key={idx}
-              onClick={() => handleClick(idx)}
-              className={`flex items-center justify-center cursor-pointer text-2xl sm:text-3xl select-none
-                ${dark ? "bg-green-700" : "bg-green-200"}
-                ${selected === idx ? "ring-4 ring-yellow-400" : ""}
-                ${p && isWhite(p) ? "text-white" : p ? "text-black" : ""}`}
-              style={{ aspectRatio: "1 / 1" }}
-            >
-              {pieceToChar(p)}
-            </div>
-          );
-        })}
+    <div className="flex flex-col items-center justify-center mt-4">
+      <div className="bg-amber-900 p-3 rounded-2xl shadow-lg">
+        <div className="grid grid-cols-8 gap-0 border-4 border-amber-800 rounded-lg overflow-hidden">
+          {board.map((row, r) =>
+            row.map((p, c) => {
+              const dark = (r + c) % 2 === 1;
+              const key = `${r}-${c}`;
+              return (
+                <div
+                  key={key}
+                  onClick={() => handleSquareClick(r, c)}
+                  className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-2xl sm:text-3xl cursor-pointer select-none
+                    ${dark ? "bg-amber-800" : "bg-amber-200"}
+                    ${selected && selected[0] === r && selected[1] === c ? "ring-4 ring-yellow-400" : ""}
+                    ${p && isWhite(p) ? "text-white" : p ? "text-black" : ""}
+                  `}
+                >
+                  {pieceToChar(p)}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
-      <p className="mt-3 text-sm opacity-80 text-center">
-        You are playing as <b>White</b>
-      </p>
+
+      <p className="mt-4 text-sm text-gray-300">You are playing as White</p>
     </div>
   );
-}
+};
+
+export default ChessGame;
