@@ -1,0 +1,85 @@
+/* styles/Oxox.module.css */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #4CAF50; /* Green for main title */
+}
+
+.status {
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.board {
+    /* Set board dimensions and display as a grid */
+    width: 630px; 
+    height: 630px;
+    display: grid;
+    border: 3px solid #333;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    font-weight: bold;
+    border: 1px solid #aaa;
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+    transition: background-color 0.1s;
+}
+
+.cell:hover {
+    background-color: #e0e0e0;
+}
+
+.X {
+    color: #E91E63; /* Pink for Player X */
+}
+
+.O {
+    color: #2196F3; /* Blue for Computer O */
+}
+
+.resetButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.resetButton:hover {
+    background-color: #45a049;
+}
+
+/* --- Styling for 3x3 Block Visuals (Thicker lines) --- */
+
+/* Thick vertical lines at column 3 and 6 */
+.cell:nth-child(9n + 3), 
+.cell:nth-child(9n + 6) {
+    border-right-width: 3px;
+    border-right-color: #333;
+}
+
+/* Thick horizontal lines at row 3 and 6 */
+.cell:nth-child(n + 19):nth-child(-n + 27), /* Row 3 (Cells 19 to 27) */
+.cell:nth-child(n + 46):nth-child(-n + 54) { /* Row 6 (Cells 46 to 54) */
+    border-bottom-width: 3px;
+    border-bottom-color: #333;
+}
