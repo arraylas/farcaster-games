@@ -1,84 +1,71 @@
-/* styles/Oxox.module.css */
+                                                                                /* styles/Oxox.module.css */
 
 .container {
     display: flex;
-        flex-direction: column;
-            align-items: center;
-                padding: 20px;
-                    font-family: Arial, sans-serif;
-                    }
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
 
-                    /* FIX: Menggunakan class .title agar sesuai dengan CSS Modules */
-                    .title { 
-                        color: #4CAF50; /* Green for main title */
-                        }
+/* Using a class for the title selector to comply with CSS Modules */
+.title { 
+    color: #4CAF50;
+}
 
-                        .status {
-                            margin: 20px 0;
-                                font-size: 1.2em;
-                                    font-weight: bold;
-                                        color: #333;
-                                        }
+.status {
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
 
-                                        .board {
-                                            /* Set board dimensions and display as a grid */
-                                                width: 630px; 
-                                                    height: 630px;
-                                                        display: grid;
-                                                            border: 3px solid #333;
-                                                                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                                                                }
+.board {
+    /* Adjusted size for 5x5 */
+    width: 500px; 
+    height: 500px;
+    display: grid;
+    /* Grid template is set dynamically in the component */
+    border: 3px solid #333;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
 
-                                                                .cell {
-                                                                    display: flex;
-                                                                        justify-content: center;
-                                                                            align-items: center;
-                                                                                font-size: 2em;
-                                                                                    font-weight: bold;
-                                                                                        border: 1px solid #aaa;
-                                                                                            cursor: pointer;
-                                                                                                user-select: none; /* Prevent text selection */
-                                                                                                    transition: background-color 0.1s;
-                                                                                                    }
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    font-weight: bold;
+    border: 1px solid #aaa; /* Standard thin lines for 5x5 */
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s;
+}
 
-                                                                                                    .cell:hover {
-                                                                                                        background-color: #e0e0e0;
-                                                                                                        }
+.cell:hover {
+    background-color: #e0e0e0;
+}
 
-                                                                                                        .X {
-                                                                                                            color: #E91E63; /* Pink for Player X */
-                                                                                                            }
+.X {
+    color: #E91E63;
+}
 
-                                                                                                            .O {
-                                                                                                                color: #2196F3; /* Blue for Computer O */
-                                                                                                                }
+.O {
+    color: #2196F3;
+}
 
-                                                                                                                .resetButton {
-                                                                                                                    margin-top: 20px;
-                                                                                                                        padding: 10px 20px;
-                                                                                                                            font-size: 1em;
-                                                                                                                                background-color: #4CAF50;
-                                                                                                                                    color: white;
-                                                                                                                                        border: none;
-                                                                                                                                            border-radius: 5px;
-                                                                                                                                                cursor: pointer;
-                                                                                                                                                    transition: background-color 0.3s;
-                                                                                                                                                    }
+.resetButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
-                                                                                                                                                    .resetButton:hover {
-                                                                                                                                                        background-color: #45a049;
-                                                                                                                                                        }
-
-                                                                                                                                                        /* Thick vertical lines at column 3 and 6 */
-                                                                                                                                                        .cell:nth-child(9n + 3), 
-                                                                                                                                                        .cell:nth-child(9n + 6) {
-                                                                                                                                                            border-right-width: 3px;
-                                                                                                                                                                border-right-color: #333;
-                                                                                                                                                                }
-
-                                                                                                                                                                /* Thick horizontal lines at row 3 and 6 */
-                                                                                                                                                                .cell:nth-child(n + 19):nth-child(-n + 27), 
-                                                                                                                                                                .cell:nth-child(n + 46):nth-child(-n + 54) { 
-                                                                                                                                                                    border-bottom-width: 3px;
-                                                                                                                                                                        border-bottom-color: #333;
-                                                                                                                                                                        }
+.resetButton:hover {
+    background-color: #45a049;
+}                                                                                                                                                                        border-bottom-color: #333;                                                                                                                                                        }
