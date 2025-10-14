@@ -1,152 +1,87 @@
-import type { NextPage } from 'next';
-import Head from 'next/head'; // <-- Import Head
-import Link from 'next/link';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 
-// Background: Menggunakan warna ungu gelap sesuai desain Anda
-const BACKGROUND_COLOR = '#3a065f'; 
-// Warna gradien yang menyerupai 'from-indigo-800 to-purple-900' di Tailwind
-const GRADIENT_BACKGROUND = 'linear-gradient(180deg, #300050 0%, #1a0030 100%)'; 
+// --- Configuration Constants (Updated to Netlify Domain) ---
+const APP_DOMAIN = "https://farcaster-games.netlify.app";
+// Ensure this file exists in your /public folder to avoid the broken image error
+const EMBED_IMAGE_URL = `${APP_DOMAIN}/farcaster-games-embed.png`; 
 
-// --- STYLE OBJECTS ---
+export default function Home() {
+  const router = useRouter();
 
-const containerStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minHeight: '100vh',
-  padding: '20px',
-  textAlign: 'center',
-  fontFamily: 'Arial, sans-serif',
-  color: 'white', // Mengubah warna teks default menjadi putih
-  backgroundColor: BACKGROUND_COLOR, // Menggunakan warna dasar ungu
-  backgroundImage: GRADIENT_BACKGROUND, // Menambahkan gradien
-};
+  const navigateToGame = (path: string) => {
+    router.push(path);
+  };
 
-const titleStyle: React.CSSProperties = {
-  fontSize: '2.5em',
-  fontWeight: 'bold',
-  marginBottom: '15px',
-  // Warna yang lebih cerah
-  color: '#90CAF9', // Light Blue/Cyan untuk kontras
-};
+  // Define the Farcaster Mini App metadata object
+  const miniappMetadata = {
+    version: "next",
+    imageUrl: EMBED_IMAGE_URL,
+    button: {
+      title: "Launch Farcaster Games",
+      action: {
+        type: "launch_miniapp",
+        name: "Farcaster Games Hub",
+        url: APP_DOMAIN,
+      },
+    },
+  };
 
-const subTitleStyle: React.CSSProperties = {
-  fontSize: '1.5em',
-  fontWeight: '600',
-  marginTop: '20px',
-  marginBottom: '20px',
-};
+  return (
+    <>
+      {/* CRITICAL: Farcaster Metadata (OpenGraph & fc:miniapp) 
+        This is what tells Farcaster clients how to render the embed.
+      */}
+      <Head>
+        <title>Farcaster Games Hub</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        {/* Standard OpenGraph Meta Tags for previews */}
+        <meta property="og:title" content="Farcaster Games Hub: Chess & OXOX" />
+        <meta property="og:description" content="Play Chess and OXOX 5x5 directly inside the Farcaster Mini App." />
+        <meta property="og:image" content={EMBED_IMAGE_URL} />
+        <meta property="og:url" content={APP_DOMAIN} />
 
-const paragraphStyle: React.CSSProperties = {
-  maxWidth: '600px',
-  margin: '10px 0 30px 0',
-  fontSize: '1.1em',
-  color: 'rgba(255, 255, 255, 0.85)', // Putih transparan
-};
+        {/* Farcaster Mini App Specific Tag */}
+        <meta name="fc:miniapp" content={JSON.stringify(miniappMetadata)} />
+      </Head>
 
-// --- STYLE KHUSUS UNTUK TOMBOL ---
-const buttonContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: '300px', // Batasi lebar tombol
-    gap: '16px', // Memberikan spasi 16px antar tombol
-    margin: '20px 0',
-};
+      {/* Main Content */}
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 font-inter">
+        <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md">
+          <h1 className="text-4xl font-extrabold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-500">
+            Farcaster Games Hub
+          </h1>
+          <p className="text-center text-gray-400 mb-8">
+            Challenge the AI in two classic games.
+          </p>
 
-const linkStyleBase: React.CSSProperties = {
-    width: '100%', // Tombol mengambil lebar penuh container
-    padding: '15px 20px',
-    fontSize: '1.2em',
-    color: 'white',
-    textDecoration: 'none',
-    borderRadius: '10px',
-    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
-    transition: 'background-color 0.3s, transform 0.1s',
-    fontWeight: 'bold',
-};
-
-const oxoxLinkStyle: React.CSSProperties = {
-    ...linkStyleBase,
-    backgroundColor: '#388E3C', // Hijau yang lebih gelap
-};
-
-const chessLinkStyle: React.CSSProperties = {
-    ...linkStyleBase,
-    backgroundColor: '#1976D2', // Biru yang lebih gelap
-};
-
-
-// --- PAGE COMPONENT ---
-const IndexPage: NextPage = () => {
-  
-    // Domain aplikasi live Anda
-    const APP_DOMAIN = "https://farcaster-achivement.vercel.app";
-    // URL untuk gambar pratinjau Mini App
-    // MENGGUNAKAN IMAGE PLACEHOLDER SEMENTARA
-    const EMBED_IMAGE_URL = "https://i.imgur.com/K5b1V2I.png"; // Placeholder image (Base logo)
-
-  return (
-    <>
-        <Head>
-            {/* META TAG KRITIS UNTUK DISCOVERY MINI APP DI FARCASTER */}
-            {/* CATATAN: URL gambar telah diganti dengan placeholder yang valid */}
-            <meta name="fc:miniapp" content={`{
-                "version":"next",
-                "imageUrl":"${EMBED_IMAGE_URL}",
-                "button":{
-                    "title":"Launch Farcaster Games",
-                    "action":{
-                        "type":"launch_miniapp",
-                        "name":"Farcaster Games Hub",
-                        "url":"${APP_DOMAIN}"
-                    }
-                }
-            }`} />
-        </Head>
-        <div style={containerStyle}>
-      
-          {/* JUDUL UTAMA */}
-          <h1 style={titleStyle}>🎮 Farcaster Games</h1>
-      
-          {/* DESKRIPSI UTAMA */}
-          <p style={paragraphStyle}>
-            Welcome to Farcaster Games! This is your hub for fun, challenging mini-games built for the Farcaster ecosystem. Start playing against the AI now!
-          </p>
-      
-          <h2 style={subTitleStyle}>Ready to Play?</h2>
-      
-          {/* CONTAINER TOMBOL: Memastikan tombol menumpuk */}
-          <div style={buttonContainerStyle}>
-        
-            {/* TOMBOL OXOX */}
-            <Link href="/oxox" style={oxoxLinkStyle}>
-              ❌⭕ Play OXOX 5x5
-            </Link>
-            
-            {/* TOMBOL CHESS (Ditambahkan, diasumsikan Anda punya halaman /chess) */}
-            <Link href="/chess" style={chessLinkStyle}>
-              ♟️ Play Chess vs AI
-            </Link>
-
-          </div>
-      
-          <p style={{ marginTop: '20px', fontSize: '1.1em', color: 'rgba(255, 255, 255, 0.7)' }}>
-            🚀 More Games and Onchain Achievements Coming Soon...
-          </p>
-
-          <p style={{ marginTop: '10px', fontSize: '0.9em', color: 'rgba(255, 255, 255, 0.6)' }}>
-            You can support me on ETH:{" "}
-            <span style={{ color: '#E0B0FF' }}>
-              0x3f05e8770134e70A7ACD907C2725d8DA64f0fBfe
-            </span>
-          </p>
-      
-        </div>
-    </>
-  );
-};
-
-export default IndexPage;
+          <div className="space-y-4">
+            <button
+              onClick={() => navigateToGame('/oxox')}
+              className="w-full py-4 text-lg font-bold rounded-xl transition duration-300 ease-in-out transform hover:scale-[1.02] bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/50"
+            >
+              ❌⭕ Play OXOX 5x5
+            </button>
+            <button
+              onClick={() => navigateToGame('/chess')}
+              className="w-full py-4 text-lg font-bold rounded-xl transition duration-300 ease-in-out transform hover:scale-[1.02] bg-purple-600 hover:bg-purple-700 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-500/50"
+            >
+              ♟️ Play Chess vs AI
+            </button>
+          </div>
+          <p className="text-xs text-center text-gray-500 mt-6">
+            <a 
+              href="https://docs.farcaster.xyz/mini-apps" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-purple-400 underline"
+            >
+              Powered by Farcaster Mini Apps
+            </a>
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
