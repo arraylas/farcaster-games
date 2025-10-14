@@ -1,10 +1,9 @@
 [build]
-
-#Next.js build command
+# Perintah build untuk Next.js
 command = "next build"
+# BARIS KRUSIAL: Memberi tahu Netlify bahwa output statis ada di folder 'out'.
+publish = "out"
 
 [[plugins]]
-
-#The official Netlify plugin to correctly handle Next.js routing,
-#serverless functions, and asset optimization.
+# Plugin resmi Netlify untuk menangani routing Next.js.
 package = "@netlify/plugin-nextjs"
