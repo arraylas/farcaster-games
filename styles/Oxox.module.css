@@ -1,92 +1,79 @@
-/* styles/Oxox.module.css */
-
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    /* Membuat kontainer responsif */
-    width: 100%; 
-    box-sizing: border-box; 
-    min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #000;
+  color: #4caf50;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-.title { 
-    color: #4CAF50;
-    font-size: clamp(1.5em, 6vw, 2.5em); /* Judul responsif */
+.title {
+  font-size: clamp(1.2em, 4vw, 2em);
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .status {
-    margin: 20px 0;
-    font-size: clamp(1em, 4vw, 1.5em); 
-    font-weight: bold;
-    color: #333;
+  font-size: clamp(1em, 3vw, 1.2em);
+  margin-bottom: 15px;
+  text-align: center;
+  color: #ccc;
 }
 
+/* 🔥 FIX GRID ISSUE */
 .board {
-    /* Perubahan utama untuk responsivitas */
-    width: 90vw; /* Mengambil 90% dari lebar viewport (layar HP) */
-    max-width: 500px; /* Tapi tidak lebih besar dari 500px di desktop */
-    height: 0; 
-    padding-bottom: 90vw; /* Membuat kotak aspek rasio 1:1, menyesuaikan lebar viewport */
-    max-height: 500px; /* Batasan tinggi */
-    
-    display: grid;
-    border: 3px solid #333;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
-    
-    /* Grid template is set dynamically in the component */
+  width: 90vw;
+  max-width: 500px;
+  aspect-ratio: 1 / 1; /* instead of height: 0 hack */
+  display: grid;
+  gap: 4px;
+  border: 2px solid #333;
+  background-color: #111;
+  padding: 6px;
+  box-shadow: 0 0 15px rgba(0, 255, 100, 0.3);
+  margin-bottom: 20px;
 }
 
 .cell {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: clamp(1.5em, 8vw, 2.5em); /* Ukuran X/O sangat responsif */
-    font-weight: bold;
-    border: 1px solid #aaa;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.5em, 6vw, 2.5em);
+  font-weight: bold;
+  border: 1px solid #333;
+  background-color: #000;
+  color: #00ff80;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .cell:hover {
-    background-color: #e0e0e0;
+  background-color: #222;
 }
 
 .X {
-    color: #E91E63;
+  color: #ff3b3b;
 }
 
 .O {
-    color: #2196F3;
-}
-
-.resetButton, .shareButton {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 1em;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    color: white;
+  color: #00aaff;
 }
 
 .resetButton {
-    background-color: #4CAF50;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .resetButton:hover {
-    background-color: #45a049;
-}
-
-.shareButton {
-    background-color: #635BFF; /* Farcaster Blue */
-    margin-left: 10px;
-}
-.shareButton:hover {
-    background-color: #5247db;
+  background-color: #45a049;
 }
