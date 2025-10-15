@@ -1,180 +1,166 @@
-// components/ChessGame.tsx
-'use client'; 
+'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { Chess, Square } from 'chess.js'; 
+import React, { useState, useEffect, useCallback } from 'react';
+import { Chess, Square } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
-import styles from '../styles/ChessGame.module.css'; // PERBAIKAN IMPORT PATH DAN FORMAT
 
-// --- WARNA UNTUK KOTAK CATUR ---
-const LIGHT_SQUARE_COLOR = '#90CAF9'; // Light Blue/Cyan
-const DARK_SQUARE_COLOR = '#5e35b1'; // Darker Purple
-
-// Definisi Props
-interface ChessGameProps {
-  onGameOver: (result: 'You' | 'AI' | 'Draw') => void;
-  isDarkTheme: boolean; 
+interface Props {
+  onGameOver: (result: 'You' | 'AI' | 'Draw') => void;
 }
 
-type GameStatus = 'playing' | 'win' | 'lose' | 'draw';
+const DARK_SQUARE = '#5e35b1';
+const LIGHT_SQUARE = '#90CAF9';
 
-// AI Acak (Beginner Level)
-const makeRandomMove = (gameInstance: Chess): string | null => {
-    const possibleMoves = gameInstance.moves();
-    if (possibleMoves.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    return possibleMoves[randomIndex];
+// Slightly smarter AI — prioritizes capturing moves
+const getAIMove = (game: Chess): string | null => {
+  const moves = game.moves({ verbose: true });
+  if (moves.length === 0) return null;
+
+  const captureMoves = moves.filter((m) => m.flags.includes('c'));
+  const moveList = captureMoves.length > 0 ? captureMoves : moves;
+  const randomMove = moveList[Math.floor(Math.random() * moveList.length)];
+  return randomMove.san;
 };
 
+export default function ChessGame({ onGameOver }: Props) {
+  const [game, setGame] = useState(new Chess());
+  const [status, setStatus] = useState<'playing' | 'win' | 'lose' | 'draw'>('playing');
+  const [isThinking, setIsThinking] = useState(false);
+  const [frameUrl, setFrameUrl] = useState('');
 
-export default function ChessGame({ onGameOver, isDarkTheme }: ChessGameProps) {
-  const [game, setGame] = useState(new Chess());
-  const [boardOrientation] = useState('white');
-  const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
-  const [isLoading, setIsLoading] = useState(false);
-  const [frameUrl, setFrameUrl] = useState('');
+  const safeMutate = (fn: (g: Chess) => void) => {
+    setGame((prev) => {
+      const copy = new Chess(prev.fen());
+      fn(copy);
+      return copy;
+    });
+  };
 
-  // Memastikan perubahan state game dilakukan dengan aman dan imutabel
-  function safeGameMutate(modify: (game: Chess) => void) {
-    setGame((g) => {
-      const newGame = new Chess(g.fen()); 
-      modify(newGame);
-      return newGame;
-    });
-  }
-  
-  // Fungsi pengecekan status akhir game
-  const checkGameStatus = useCallback((fen: string) => {
-    const tempGame = new Chess(fen);
-    
-    if (tempGame.isGameOver()) { 
-      let result: 'You' | 'AI' | 'Draw';
+  const checkEnd = useCallback(
+    (fen: string) => {
+      const test = new Chess(fen);
+      if (!test.isGameOver()) return false;
 
-      if (tempGame.isCheckmate()) { 
-        result = tempGame.turn() === 'w' ? 'AI' : 'You';
-        setGameStatus(result === 'You' ? 'win' : 'lose');
-      } else if (tempGame.isStalemate() || tempGame.isThreefoldRepetition() || tempGame.isInsufficientMaterial()) {
-        result = 'Draw';
-        setGameStatus('draw');
-      } else {
-        result = 'Draw';
-        setGameStatus('draw');
-      }
+      let result: 'You' | 'AI' | 'Draw' = 'Draw';
+      if (test.isCheckmate()) result = test.turn() === 'w' ? 'AI' : 'You';
+      else if (
+        test.isStalemate() ||
+        test.isThreefoldRepetition() ||
+        test.isInsufficientMaterial()
+      )
+        result = 'Draw';
 
-      onGameOver(result); 
-      return true;
-    } 
-    setGameStatus('playing');
-    return false;
-  }, [onGameOver]); 
+      setStatus(result === 'You' ? 'win' : result === 'AI' ? 'lose' : 'draw');
+      onGameOver(result);
 
-  // Fungsi untuk memicu AI
-  const handleAIMove = useCallback(() => {
-    setIsLoading(true);
-    
-    // Delay untuk simulasi berpikir
-    setTimeout(() => {
-        let aiMove = makeRandomMove(game);
-        
-        if (aiMove) {
-            safeGameMutate((game) => {
-                game.move(aiMove!);
-            });
-            checkGameStatus(game.fen());
-        }
-        setIsLoading(false);
-    }, 500); 
-  }, [game, checkGameStatus]);
+      const baseUrl = 'https://farcaster.xyz/miniapps/At9-eGqFG7q4/farcaster-games-hub';
+      const finalUrl = `${baseUrl}?status=${result.toUpperCase()}`;
+      setFrameUrl(finalUrl);
 
-  // Handler saat pemain melakukan gerakan
-  function onDrop(sourceSquare: Square, targetSquare: Square) {
-    if (gameStatus !== 'playing' || isLoading) return false;
-    
-    let move = null;
-    safeGameMutate((game) => {
-      move = game.move({
-        from: sourceSquare,
-        to: targetSquare,
-        promotion: 'q',
-      });
-    });
+      return true;
+    },
+    [onGameOver]
+  );
 
-    if (move === null) return false;
-    
-    checkGameStatus(game.fen());
-    
-    return true;
-  }
+  const handleAIMove = useCallback(() => {
+    if (game.isGameOver()) return;
+    setIsThinking(true);
 
-  // Effect untuk memicu gerakan AI dan mengatur Frame URL
-  useEffect(() => {
-    if (game.turn() === 'b' && gameStatus === 'playing' && !game.isGameOver() && !isLoading) { 
-      handleAIMove();
-    }
-    
-    if (gameStatus !== 'playing') {
-      let resultText = '';
-      if (gameStatus === 'win') resultText = 'WIN';
-      else if (gameStatus === 'lose') resultText = 'LOSE';
-      else if (gameStatus === 'draw') resultText = 'DRAW';
+    setTimeout(() => {
+      const aiMove = getAIMove(game);
+      if (aiMove) {
+        safeMutate((g) => g.move(aiMove));
+        checkEnd(game.fen());
+      }
+      setIsThinking(false);
+    }, 600);
+  }, [game, checkEnd]);
 
-      // Menggunakan URL Farcaster Hub yang benar
-      const baseFrameUrl = 'https://farcaster.xyz/miniapps/At9-eGqFG7q4/farcaster-games-hub'; 
-      
-      const finalUrl = `${baseFrameUrl}?status=${resultText}`; 
-      setFrameUrl(finalUrl);
-    }
-    
-  }, [game.turn, gameStatus, game.fen, handleAIMove, isLoading]); 
+  function onDrop(source: Square, target: Square) {
+    if (status !== 'playing' || isThinking) return false;
+    let move = null;
 
-  // --- STYLE KUSTOM UNTUK KOMPONEN CHESSBOARD ---
-  // Menggunakan 'as any' untuk menghindari type error dari react-chessboard
-  const customBoardStyle = {
-    borderRadius: '8px',
-    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.5)',
-    width: 'min(95vw, 450px)', 
-  } as any; 
-  
-  const customDarkSquareStyle = { backgroundColor: DARK_SQUARE_COLOR } as any; 
-  const customLightSquareStyle = { backgroundColor: LIGHT_SQUARE_COLOR } as any; 
+    safeMutate((g) => {
+      move = g.move({ from: source, to: target, promotion: 'q' });
+    });
 
+    if (!move) return false;
 
-  return (
-    <div className={styles['chess-game-container']}> 
-      <div style={{ pointerEvents: isLoading || gameStatus !== 'playing' ? 'none' : 'auto' }}>
-        <Chessboard 
-          position={game.fen()}
-          onPieceDrop={onDrop}
-          boardOrientation={boardOrientation as 'white' | 'black'}
-          arePiecesDraggable={gameStatus === 'playing' && game.turn() === 'w' && !isLoading} 
-          
-          // Menerapkan style kustom dengan perbaikan tipe
-          customBoardStyle={customBoardStyle} 
-          customDarkSquareStyle={customDarkSquareStyle}
-          customLightSquareStyle={customLightSquareStyle}
-        />
-      </div>
+    if (!checkEnd(game.fen())) handleAIMove();
+    return true;
+  }
 
-      {/* Status message */}
-      <p className={styles['status-message']} style={{ color: isLoading ? '#FFD700' : 'white' }}> // PERBAIKAN CLASS NAME
-        {gameStatus === 'playing' ? (isLoading ? 'AI sedang berpikir...' : 'Giliran Anda (Putih)') : ''}
-      </p>
-      
-      {/* Tombol Share */}
-      {gameStatus !== 'playing' && (
-        <div className={styles['share-frame-container']}> // PERBAIKAN CLASS NAME
-          <h3>Pencapaian Farcaster!</h3>
-          <a
-            href={`https://warpcast.com/~/compose?text=Saya%20${gameStatus.toUpperCase()}%20melawan%20AI%20Catur%20Acak!%20Lihat%20pencapaian%20saya!&embeds[]=${frameUrl}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles['share-button']} // PERBAIKAN CLASS NAME
-          >
-            Bagikan Frame
-          </a>
-        </div>
-      )}
+  useEffect(() => {
+    if (game.turn() === 'b' && status === 'playing' && !isThinking) handleAIMove();
+  }, [game, status, handleAIMove, isThinking]);
 
-    </div>
-  );
+  return (
+    <div className="chess-game-container">
+      <Chessboard
+        position={game.fen()}
+        onPieceDrop={onDrop}
+        arePiecesDraggable={!isThinking && status === 'playing' && game.turn() === 'w'}
+        boardOrientation="white"
+        customBoardStyle={{
+          borderRadius: '8px',
+          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.5)',
+          width: 'min(95vw, 450px)',
+        }}
+        customLightSquareStyle={{ backgroundColor: LIGHT_SQUARE }}
+        customDarkSquareStyle={{ backgroundColor: DARK_SQUARE }}
+      />
+
+      <p className="status-msg" style={{ color: isThinking ? '#FFD700' : 'white' }}>
+        {status === 'playing'
+          ? isThinking
+            ? 'AI is thinking...'
+            : 'Your move (White)'
+          : ''}
+      </p>
+
+      {status !== 'playing' && (
+        <div className="share-frame">
+          <h3>Farcaster Achievement!</h3>
+          <a
+            href={`https://warpcast.com/~/compose?text=I%20${status.toUpperCase()}%20against%20AI!%20Check%20out%20my%20result!&embeds[]=${frameUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="share-button"
+          >
+            Share Frame
+          </a>
+        </div>
+      )}
+
+      <style jsx>{`
+        .chess-game-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .status-msg {
+          margin-top: 10px;
+          font-size: 1.1em;
+          font-weight: 500;
+        }
+        .share-frame {
+          margin-top: 15px;
+          text-align: center;
+        }
+        .share-button {
+          background-color: #7c4dff;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 6px;
+          text-decoration: none;
+          font-weight: bold;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .share-button:hover {
+          opacity: 0.9;
+        }
+      `}</style>
+    </div>
+  );
 }
