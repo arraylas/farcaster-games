@@ -2,15 +2,15 @@
   "miniapp": {
     "version": "1",
     "name": "Farcaster Games Hub",
-    "iconUrl": "https://farcaster-games.netlify.app/icon.png",
-    "homeUrl": "https://farcaster-games.netlify.app/",
+    "iconUrl": "https://farcaster-achivement.vercel.app/icon.png",
+    "homeUrl": "https://farcaster-achivement.vercel.app/",
     "subtitle": "Onchain Classic GameHub",
     "description": "A combined Mini App featuring single-player games and a tool to generate onchain achievements.",
     "primaryCategory": "games",
-    "splashImageUrl": "https://farcaster-games.netlify.app/splash.png",
+    "splashImageUrl": "https://farcaster-achivement.vercel.app/splash.png",
     "splashBackgroundColor": "#eeccff",
-    "webhookUrl": "https://farcaster-games.netlify.app/api/webhook",
-    "imageUrl": "https://farcaster-games.netlify.app/splash.png",
+    "webhookUrl": "https://farcaster-achivement.vercel.app/api/webhook",
+    "imageUrl": "https://farcaster-achivement.vercel.app/splash.png",
     "buttonTitle": "Play Farcaster Games",
     "ogTitle": "Farcaster Games",
     "ogDescription": "Play games or generate your onchain achievements instantly."
@@ -23,7 +23,7 @@
     "miniapp"
   ],
   "tagline": "Play games and visualize your Farcaster journey.",
-  "castShareUrl": "https://farcaster-games.netlify.app/",
+  "castShareUrl": "https://farcaster-achivement.vercel.app/",
   "baseBuilder": {
     "allowedAddresses": [
       "0x14c6a3fb0fa46a43d01dc7426d7c27cf8c71c10a", 
