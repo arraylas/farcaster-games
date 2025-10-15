@@ -25,8 +25,7 @@
   "tagline": "Play games and visualize your Farcaster journey.",
   "castShareUrl": "https://farcaster-achivement.vercel.app/",
   "baseBuilder": {
-    "allowedAddresses": [
-      "0x14c6a3fb0fa46a43d01dc7426d7c27cf8c71c10a", 
+    "allowedAddresses": [ 
       "0x33Ba92a6aEc75A18100C881afEe6feC694b020e5" 
     ]
   },
