@@ -2,11 +2,10 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { SiFarcaster } from 'react-icons/si';
-import { GiGamepad } from 'react-icons/gi';
+import { GiGamepad, GiSnake, GiAbstract024, GiBabyFace } from 'react-icons/gi';
 import { FaChessPawn, FaHandRock } from 'react-icons/fa';
 import { PiRocketLaunchFill } from 'react-icons/pi';
-import { GiSnake, GiAbstract024 } from 'react-icons/gi';
-import { GiBabyFace } from 'react-icons/gi'; // icon untuk Pou
+import { TbSquareRotated, TbBomb } from 'react-icons/tb'; // Tetris + Minesweeper
 
 const APP_DOMAIN = "https://farcaster-achivement.vercel.app";
 const EMBED_IMAGE_URL = `${APP_DOMAIN}/farcaster-games-embed.png`;
@@ -18,13 +17,24 @@ const miniappMetadata = {
   iconUrl: `${APP_DOMAIN}/icon.png`,
   homeUrl: APP_DOMAIN,
   subtitle: "Farcaster Games Hub",
-  description: "Play Chess, OXOX, Janken, Snake, 2048, and Pou — all inside the Farcaster Games Hub!",
+  description: "Play Chess, OXOX, Janken, Snake, 2048, Pou, Tetris, Minesweeper — all inside the Farcaster Games Hub!",
   imageUrl: EMBED_IMAGE_URL,
   buttonTitle: "Launch Farcaster Games",
   primaryCategory: "games",
 };
 
 export default function Home() {
+  const games = [
+    { href: '/oxox', label: 'Play OXOX 5x5', bg: 'bg-green-600', icon: <span className="text-3xl mr-3">X O</span> },
+    { href: '/chess', label: 'Play Chess', bg: 'bg-blue-600', icon: <FaChessPawn className="text-3xl mr-3" /> },
+    { href: '/janken', label: 'Play Janken', bg: 'bg-pink-600', icon: <FaHandRock className="text-3xl mr-3" /> },
+    { href: '/snake', label: 'Play Snake', bg: 'bg-purple-700', icon: <GiSnake className="text-3xl mr-3" /> },
+    { href: '/2048', label: 'Play 2048', bg: 'bg-orange-600', icon: <GiAbstract024 className="text-3xl mr-3" /> },
+    { href: '/pou', label: 'Play Pou', bg: 'bg-yellow-600', icon: <GiBabyFace className="text-3xl mr-3" /> },
+    { href: '/tetris', label: 'Play Tetris', bg: 'bg-teal-600', icon: <TbSquareRotated className="text-3xl mr-3" /> },
+    { href: '/minesweeper', label: 'Play Minesweeper', bg: 'bg-red-600', icon: <TbBomb className="text-3xl mr-3" /> },
+  ];
+
   return (
     <>
       <Head>
@@ -41,7 +51,7 @@ export default function Home() {
       </Head>
 
       <main className="min-h-screen flex flex-col items-center justify-start py-10 px-6 bg-[#30064a] text-white">
-        <div className="w-full max-w-sm text-center p-6 rounded-xl">
+        <div className="w-full max-w-3xl text-center p-6 rounded-xl">
 
           {/* Header */}
           <div className="flex flex-col items-center mb-6">
@@ -58,75 +68,18 @@ export default function Home() {
 
           <h2 className="text-2xl font-bold mb-6 text-white">Choose Your Game</h2>
 
-          <div className="flex flex-col space-y-4">
-
-            {/* OXOX */}
-            <Link
-              href="/oxox"
-              className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl 
-                        bg-green-600 hover:bg-green-700 transition duration-300 transform hover:scale-[1.02]
-                        shadow-lg shadow-green-900/50"
-            >
-              <span className="text-3xl mr-3 font-bold">X O</span>
-              Play OXOX 5x5
-            </Link>
-
-            {/* Chess */}
-            <Link
-              href="/chess"
-              className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl 
-                        bg-blue-600 hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02]
-                        shadow-lg shadow-blue-900/50"
-            >
-              <FaChessPawn className="text-3xl mr-3" />
-              Play Chess
-            </Link>
-
-            {/* Janken */}
-            <Link
-              href="/janken"
-              className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl 
-                        bg-pink-600 hover:bg-pink-700 transition duration-300 transform hover:scale-[1.02]
-                        shadow-lg shadow-pink-900/50"
-            >
-              <FaHandRock className="text-3xl mr-3" />
-              Play Janken
-            </Link>
-
-            {/* Snake */}
-            <Link
-              href="/snake"
-              className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl
-                        bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-800 hover:to-indigo-700
-                        transition duration-300 transform hover:scale-[1.02]
-                        shadow-lg shadow-purple-900/50"
-            >
-              <GiSnake className="text-3xl mr-3" />
-              Play Snake
-            </Link>
-
-            {/* 2048 */}
-            <Link
-              href="/2048"
-              className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl
-                        bg-orange-600 hover:bg-orange-700 transition duration-300 transform hover:scale-[1.02]
-                        shadow-lg shadow-orange-900/50"
-            >
-              <GiAbstract024 className="text-3xl mr-3" />
-              Play 2048
-            </Link>
-
-            {/* Pou */}
-            <Link
-              href="/pou"
-              className="flex items-center justify-center w-full py-4 px-6 rounded-lg font-extrabold text-xl
-                        bg-yellow-600 hover:bg-yellow-700 transition duration-300 transform hover:scale-[1.02]
-                        shadow-lg shadow-yellow-900/50"
-            >
-              <GiBabyFace className="text-3xl mr-3" />
-              Play Pou
-            </Link>
-
+          {/* Games Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+            {games.map((game) => (
+              <Link
+                key={game.href}
+                href={game.href}
+                className={`${game.bg} hover:opacity-90 transition duration-300 transform hover:scale-[1.02] shadow-lg shadow-black/30 flex items-center justify-center py-6 px-4 rounded-lg font-extrabold text-xl h-24`}
+              >
+                {game.icon}
+                {game.label}
+              </Link>
+            ))}
           </div>
 
           {/* Coming Soon */}

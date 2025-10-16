@@ -4,14 +4,13 @@ import Head from 'next/head';
 import Link from 'next/link';
 import React, { useState, useEffect, useCallback } from 'react';
 
-// --- CONSTANTS ---
 const GRID_SIZE = 5;
 const WINNING_LENGTH = 4;
 const PLAYER_SYMBOL = '❌';
 const AI_SYMBOL = '⭕';
 const EMPTY_CELL = null;
 
-const BASE_FRAME_URL = 'https://farcaster.xyz/miniapps/At9-eGqFG7q4/farcaster-games-hub';
+const BASE_FRAME_URL = 'https://farcaster.xyz/miniapps/9HwP06is7xxa/farcaster-games-hub';
 
 // --- GAME LOGIC ---
 const checkWinner = (board: (string | null)[][]): string | null => {
@@ -47,7 +46,6 @@ const checkWinner = (board: (string | null)[][]): string | null => {
 const isBoardFull = (board: (string | null)[][]): boolean =>
   board.flat().every(cell => cell !== EMPTY_CELL);
 
-// --- AI LOGIC ---
 const findBestMove = (board: (string | null)[][]): { r: number; c: number } | null => {
   const available: { r: number; c: number }[] = [];
   board.forEach((row, r) =>
@@ -58,21 +56,18 @@ const findBestMove = (board: (string | null)[][]): { r: number; c: number } | nu
 
   if (available.length === 0) return null;
 
-  // Try win
   for (const move of available) {
     const temp = board.map(row => [...row]);
     temp[move.r][move.c] = AI_SYMBOL;
     if (checkWinner(temp) === AI_SYMBOL) return move;
   }
 
-  // Try block player
   for (const move of available) {
     const temp = board.map(row => [...row]);
     temp[move.r][move.c] = PLAYER_SYMBOL;
     if (checkWinner(temp) === PLAYER_SYMBOL) return move;
   }
 
-  // Prefer center or near center
   const center = Math.floor(GRID_SIZE / 2);
   available.sort((a, b) => {
     const da = Math.abs(a.r - center) + Math.abs(a.c - center);
@@ -83,7 +78,6 @@ const findBestMove = (board: (string | null)[][]): { r: number; c: number } | nu
   return available[0];
 };
 
-// --- PAGE COMPONENT ---
 const OXOXPage: NextPage = () => {
   const initialBoard = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(EMPTY_CELL));
 
@@ -204,31 +198,27 @@ const OXOXPage: NextPage = () => {
           )}
         </div>
 
+        {/* ✅ Action Buttons dengan Emoji & Rapi */}
         {(isGameOver || winner) && (
-          <div style={{ marginTop: '20px' }}>
-            <button className="base-button play-again-button" onClick={resetGame}>
-              Play Again
-            </button>
-
+          <div className="action-buttons">
+            <button className="base-button play-again">🎮 Play Again</button>
             {frameUrl && (
               <a
                 href={`https://warpcast.com/~/compose?text=I%20played%20OXOX%205x5!%20Check%20out%20my%20result!&embeds[]=${frameUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="base-button share-button"
+                className="base-button share-frame"
               >
-                Share Frame
+                📸 Share Frame
               </a>
             )}
+            <Link href="/" className="base-button back-hub">
+              🏠 Back to Hub
+            </Link>
           </div>
         )}
-
-        <Link href="/" className="base-button home-link-button">
-          Back to Main Menu
-        </Link>
       </div>
 
-      {/* --- STYLES --- */}
       <style jsx>{`
         .oxox-container {
           display: flex;
@@ -281,37 +271,42 @@ const OXOXPage: NextPage = () => {
         .oxox-cell-clickable:hover {
           background-color: #64748b;
         }
+        .action-buttons {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
         .base-button {
-          padding: 10px 20px;
+          padding: 12px 20px;
           font-size: 1em;
           font-weight: bold;
           border: none;
-          border-radius: 8px;
+          border-radius: 10px;
           cursor: pointer;
-          margin-top: 20px;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
           transition: background-color 0.3s, transform 0.1s;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
         }
         .base-button:active {
           transform: scale(0.97);
         }
-        .play-again-button {
+        .play-again {
           background-color: #c084fc;
           color: white;
         }
-        .share-button {
+        .share-frame {
           background-color: #7c4dff;
           color: white;
-          text-decoration: none;
-          margin-left: 10px;
         }
-        .home-link-button {
+        .back-hub {
           background-color: #38bdf8;
           color: #0f172a;
-          text-decoration: none;
-          margin-top: 15px;
-          display: block;
-          width: fit-content;
         }
       `}</style>
     </>

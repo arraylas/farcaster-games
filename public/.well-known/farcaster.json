@@ -15,19 +15,17 @@
     "ogTitle": "Farcaster Games",
     "ogDescription": "Play games or generate your onchain achievements instantly."
   },
-  "tags": [
-    "chess",
-    "games",
-    "utility",
-    "farcaster",
-    "miniapp"
-  ],
+  "frame": {
+    "path": "/frame",
+    "postUrl": "https://farcaster-achivement.vercel.app/api/frame",
+    "buttons": ["Play Again", "Main Menu"],
+    "aspectRatio": "1.91:1"
+  },
+  "tags": ["chess", "games", "utility", "farcaster", "miniapp"],
   "tagline": "Play games and visualize your Farcaster journey.",
-  "castShareUrl": "https://farcaster-achivement.vercel.app/",
+  "castShareUrl": "https://farcaster.xyz/miniapps/9HwP06is7xxa/farcaster-games-hub",
   "baseBuilder": {
-    "allowedAddresses": [ 
-      "0x33Ba92a6aEc75A18100C881afEe6feC694b020e5" 
-    ]
+    "allowedAddresses": ["0x33Ba92a6aEc75A18100C881afEe6feC694b020e5"]
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjI5Mjg4MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweDNmMDVlODc3MDEzNGU3MEE3QUNEOTA3QzI3MjVkOERBNjRmMGZCZmUifQ",

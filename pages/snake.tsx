@@ -18,22 +18,9 @@ export default function SnakeGame() {
   const [isGameOver, setIsGameOver] = useState(false);
   const gameLoop = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Arrow key controls
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowUp" && direction !== "DOWN") setDirection("UP");
-      if (e.key === "ArrowDown" && direction !== "UP") setDirection("DOWN");
-      if (e.key === "ArrowLeft" && direction !== "RIGHT") setDirection("LEFT");
-      if (e.key === "ArrowRight" && direction !== "LEFT") setDirection("RIGHT");
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [direction]);
-
   // Main game loop
   useEffect(() => {
     if (isGameOver) return;
-
     gameLoop.current = setInterval(() => {
       setSnake((prev) => {
         const head = { ...prev[0] };
@@ -42,17 +29,18 @@ export default function SnakeGame() {
         if (direction === "LEFT") head.x -= 1;
         if (direction === "RIGHT") head.x += 1;
 
-        // Collision
+        // Collision detection
         if (
-          head.x < 0 || head.x >= GRID_SIZE ||
-          head.y < 0 || head.y >= GRID_SIZE ||
+          head.x < 0 ||
+          head.x >= GRID_SIZE ||
+          head.y < 0 ||
+          head.y >= GRID_SIZE ||
           prev.some((cell) => cell.x === head.x && cell.y === head.y)
         ) {
           setIsGameOver(true);
           return prev;
         }
 
-        // Eat food
         let newSnake = [head, ...prev];
         if (head.x === food.x && head.y === food.y) {
           setFood({
@@ -63,6 +51,7 @@ export default function SnakeGame() {
         } else {
           newSnake.pop();
         }
+
         return newSnake;
       });
     }, 150);
@@ -81,22 +70,22 @@ export default function SnakeGame() {
   };
 
   const shareFrame = () => {
-    alert("🪄 Share feature coming soon to Farcaster!");
+    alert("🪄 Share feature coming soon!");
   };
 
   return (
     <>
       <Head>
-        <title>Snake Game - Farcaster Games</title>
+        <title>🐍 Snake Game - Farcaster Games</title>
       </Head>
 
-      <main className="flex flex-col items-center justify-center min-h-screen bg-[#1a0030] text-white font-sans p-6">
-        <h1 className="text-4xl font-extrabold mb-4 text-[#90CAF9]">🐍 Snake Game</h1>
-        <p className="text-lg text-purple-300 mb-6">Use arrow keys or buttons to move!</p>
+      <main className="flex flex-col items-center min-h-screen bg-[#1a0030] text-white p-6 text-center font-inter">
+        <h1 className="text-3xl font-bold mb-3 text-sky-400">🐍 Snake Game</h1>
+        <p className="text-lg text-purple-200 mb-4">Touch the arrows to move!</p>
 
         {/* Game Grid */}
         <div
-          className="grid border-4 border-purple-500 rounded-lg mb-6"
+          className="grid border-4 border-purple-500 rounded-lg mb-4"
           style={{
             gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`,
             gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
@@ -117,36 +106,78 @@ export default function SnakeGame() {
               <div
                 key={index}
                 className={`border border-[#2e004e] ${
-                  isHead ? "bg-green-400 shadow-[0_0_10px_#00ff99]" :
-                  isSnake ? "bg-green-700" :
-                  isFood ? "bg-pink-400 shadow-[0_0_10px_#ff66cc]" :
-                  "bg-transparent"
+                  isHead
+                    ? "bg-green-400 shadow-[0_0_10px_#00ff99]"
+                    : isSnake
+                    ? "bg-green-700"
+                    : isFood
+                    ? "bg-pink-400 shadow-[0_0_10px_#ff66cc]"
+                    : "bg-transparent"
                 }`}
               />
             );
           })}
         </div>
 
-        {/* On-screen Controls */}
-        <div className="grid grid-cols-3 gap-2 mt-4 w-40">
-          <button onClick={() => setDirection("UP")} className="bg-green-600 hover:bg-green-700 p-2 rounded">⬆</button>
-          <div></div>
-          <button onClick={() => setDirection("DOWN")} className="bg-green-600 hover:bg-green-700 p-2 rounded">⬇</button>
-          <button onClick={() => setDirection("LEFT")} className="bg-green-600 hover:bg-green-700 p-2 rounded">⬅</button>
-          <div></div>
-          <button onClick={() => setDirection("RIGHT")} className="bg-green-600 hover:bg-green-700 p-2 rounded">➡</button>
-        </div>
-
-        <p className="text-xl font-semibold text-purple-200 mt-4">Score: {score}</p>
-
+        {/* Score & Game Over */}
+        <p className="text-xl font-semibold text-purple-200 mt-2">
+          Score: {score}
+        </p>
         {isGameOver && (
-          <div className="mt-4 text-lg font-bold text-red-400">Game Over! 💀</div>
+          <div className="mt-1 text-lg font-bold text-red-400">
+            Game Over 💀
+          </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-6">
-          <button onClick={resetGame} className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-[#1a0030] font-bold rounded shadow">Restart</button>
-          <button onClick={shareFrame} className="px-6 py-3 bg-purple-400 hover:bg-purple-500 text-[#1a0030] font-bold rounded shadow">Share Frame</button>
-          <Link href="/" className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-[#1a0030] font-bold rounded shadow text-center">Back to Hub</Link>
+        {/* D-Pad Controls (Touch Only) */}
+        <div className="flex flex-col items-center mt-4">
+          {/* Up */}
+          <button
+            onClick={() => setDirection("UP")}
+            className="bg-green-600 hover:bg-green-700 active:scale-95 p-4 rounded-lg text-2xl"
+          >
+            ⬆️
+          </button>
+
+          {/* Middle row: Left + Right */}
+          <div className="flex justify-center gap-4 mt-1">
+            <button
+              onClick={() => setDirection("LEFT")}
+              className="bg-green-600 hover:bg-green-700 active:scale-95 p-4 rounded-lg text-2xl"
+            >
+              ⬅️
+            </button>
+            <button
+              onClick={() => setDirection("RIGHT")}
+              className="bg-green-600 hover:bg-green-700 active:scale-95 p-4 rounded-lg text-2xl"
+            >
+              ➡️
+            </button>
+          </div>
+
+          {/* Down */}
+          <button
+            onClick={() => setDirection("DOWN")}
+            className="bg-green-600 hover:bg-green-700 active:scale-95 p-4 rounded-lg text-2xl mt-1"
+          >
+            ⬇️
+          </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col items-center gap-3 mt-6">
+          <button onClick={resetGame} className="bg-purple-500 hover:bg-purple-600 py-2 px-5 rounded-lg font-bold">
+            🔄 Play Again
+          </button>
+          <button onClick={shareFrame} className="bg-pink-500 hover:bg-pink-600 py-2 px-5 rounded-lg font-bold">
+            🔗 Share Frame
+          </button>
+          <Link
+            href="/"
+            className="bg-blue-500 hover:bg-blue-600 py-2 px-5 rounded-lg font-bold"
+          >
+            🏠 Back to Hub
+          </Link>
         </div>
       </main>
     </>

@@ -19,11 +19,10 @@ export default function PouPage() {
   const [action, setAction] = useState<"idle" | "feed" | "play" | "sleep">("idle");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Load FID safely
   useEffect(() => {
     (async () => {
       try {
-        const ctx: any = await sdk.context; // cast ke any
+        const ctx: any = await sdk.context;
         if (ctx?.fid) setFid(ctx.fid.toString());
       } catch (e) {
         console.warn("Farcaster context not available", e);
@@ -31,19 +30,16 @@ export default function PouPage() {
     })();
   }, []);
 
-  // Load saved Pou
   useEffect(() => {
     const saved = fid ? localStorage.getItem(`${SAVE_KEY}_${fid}`) : localStorage.getItem(SAVE_KEY);
     if (saved) setPou(JSON.parse(saved));
   }, [fid]);
 
-  // Auto-save
   useEffect(() => {
     if (fid) localStorage.setItem(`${SAVE_KEY}_${fid}`, JSON.stringify(pou));
     else localStorage.setItem(SAVE_KEY, JSON.stringify(pou));
   }, [pou, fid]);
 
-  // Natural decay
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       setPou((prev) => ({
@@ -58,7 +54,6 @@ export default function PouPage() {
     };
   }, []);
 
-  // Pou actions
   const feed = () => {
     setPou((prev) => ({ ...prev, hunger: Math.min(prev.hunger + 20, MAX_VALUE) }));
     setAction("feed");
@@ -79,7 +74,6 @@ export default function PouPage() {
     setTimeout(() => setAction("idle"), 1000);
   };
 
-  // Share frame
   const shareFrame = () => {
     (sdk as any).ui?.shareFrame?.({
       title: "My Pou is doing great! 🐣",
@@ -88,7 +82,6 @@ export default function PouPage() {
     });
   };
 
-  // Pou animation class
   const getPouClass = () => {
     switch (action) {
       case "feed":
@@ -106,45 +99,99 @@ export default function PouPage() {
     <>
       <Head>
         <title>Pou - Farcaster Games Hub</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Take care of your Pou! Feed, play, and sleep." />
       </Head>
 
-      <main className="min-h-screen flex flex-col items-center justify-start py-10 px-6 bg-[#30064a] text-white">
-        <h1 className="text-4xl font-extrabold mb-6 text-purple-200">🐣 Pou Game</h1>
+      <main className="flex flex-col items-center min-h-screen bg-[#1a0030] text-white font-sans py-10 px-6">
+        <h1 className="text-4xl font-extrabold mb-4 text-[#90CAF9]">🐣 Pou Game</h1>
 
-        <div className="w-full max-w-sm bg-[#1a0030] p-6 rounded-xl flex flex-col items-center space-y-4">
-          {/* Pou Visual */}
-          <div className="w-40 h-40 mb-4 relative">
-            <img src="/pou.svg" alt="Pou" className={`w-full h-full object-contain ${getPouClass()}`} />
-          </div>
+        <div className="bg-[#2a004b] p-6 rounded-2xl shadow-lg flex flex-col items-center max-w-sm w-full">
+          {/* Pou Image */}
+          <img
+            src="/pou.svg"
+            alt="Pou"
+            className={`w-36 h-36 mb-4 ${getPouClass()}`}
+          />
 
           {/* Stats */}
-          <div className="text-xl font-bold">Hunger: {pou.hunger}</div>
-          <div className="text-xl font-bold">Happiness: {pou.happiness}</div>
-          <div className="text-xl font-bold">Energy: {pou.energy}</div>
-
-          {/* Actions */}
-          <div className="flex space-x-4 mt-4">
-            <button className="px-4 py-2 bg-green-600 rounded-lg font-bold hover:bg-green-700 transition" onClick={feed}>Feed 🍎</button>
-            <button className="px-4 py-2 bg-yellow-600 rounded-lg font-bold hover:bg-yellow-700 transition" onClick={play}>Play 🎾</button>
-            <button className="px-4 py-2 bg-blue-600 rounded-lg font-bold hover:bg-blue-700 transition" onClick={sleep}>Sleep 🛌</button>
+          <div className="text-lg font-semibold space-y-1 text-purple-200">
+            <p>🍎 Hunger: {pou.hunger}</p>
+            <p>🎾 Happiness: {pou.happiness}</p>
+            <p>💤 Energy: {pou.energy}</p>
           </div>
 
-          {/* Share Frame */}
-          {(sdk as any).ui?.shareFrame && (
-            <button className="mt-4 px-6 py-2 bg-pink-600 rounded-lg font-bold hover:bg-pink-700 transition" onClick={shareFrame}>
-              Share Frame 📸
+          {/* Action Buttons */}
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            <button onClick={feed} className="base-btn bg-green-500 hover:bg-green-600">
+              🍎 Feed
             </button>
-          )}
+            <button onClick={play} className="base-btn bg-yellow-400 hover:bg-yellow-500">
+              🎾 Play
+            </button>
+            <button onClick={sleep} className="base-btn bg-blue-400 hover:bg-blue-500">
+              🛌 Sleep
+            </button>
+          </div>
 
-          <Link href="/" className="mt-4 px-6 py-2 bg-purple-600 rounded-lg font-bold hover:bg-purple-700 transition">
-            Back to Hub
-          </Link>
+          {/* Share + Back */}
+          <div className="action-buttons">
+            {(sdk as any).ui?.shareFrame && (
+              <button onClick={shareFrame} className="base-button share-frame">
+                📸 Share Frame
+              </button>
+            )}
+            <Link href="/" className="base-button back-hub">
+              🏠 Back to Hub
+            </Link>
+          </div>
         </div>
       </main>
 
       <style jsx>{`
+        .base-btn {
+          padding: 10px 18px;
+          font-size: 1em;
+          font-weight: bold;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+          transition: background-color 0.3s, transform 0.1s;
+        }
+        .base-btn:active {
+          transform: scale(0.97);
+        }
+
+        .base-button {
+          padding: 10px 18px;
+          font-size: 1em;
+          font-weight: bold;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+          transition: background-color 0.3s, transform 0.1s;
+          text-decoration: none;
+          display: inline-block;
+        }
+        .base-button:active {
+          transform: scale(0.97);
+        }
+        .action-buttons {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
+        .share-frame {
+          background-color: #7c4dff;
+          color: white;
+        }
+        .back-hub {
+          background-color: #38bdf8;
+          color: #0f172a;
+        }
+
         .animate-idle { transform: translateY(0); transition: transform 0.5s; }
         .animate-bounce.feed { animation: bounceFeed 0.5s; }
         .animate-jump.play { animation: jumpPlay 0.5s; }
